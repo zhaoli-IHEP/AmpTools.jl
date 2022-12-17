@@ -112,7 +112,7 @@ function gen_SPcombo_v2(
   #total_term is the summation of all possible terms
   #expand the total_term and drop the coefficients
 
-@show n_q1 n_q2
+@show ori_n_q1 ori_n_q2 ori_n_q3
 
   total_term = zero(Basic)
   for q1q2_xpt in 0:min(n_q1,n_q2)
