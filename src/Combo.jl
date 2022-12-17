@@ -66,7 +66,7 @@ function generate_SPcombo(
   end # for q1_q2_exp
 
   SP_list = (get_add_vector∘expand)(total_term)
-  SP_list = map(drop_coeff,SP_list)
+  SP_list = sort( map(drop_coeff,SP_list), by=gen_sorted_str )
 
   return SP_list
 
@@ -143,7 +143,7 @@ function gen_SPcombo_v2(
   end # for q1q2_xpt
 
   SP_list = (get_add_vector∘expand)(total_term)
-  SP_list = map(drop_coeff,SP_list)
+  SP_list = sort( map(drop_coeff,SP_list), by=gen_sorted_str )
 
   return SP_list
 
