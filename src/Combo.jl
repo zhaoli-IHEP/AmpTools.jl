@@ -112,30 +112,24 @@ function gen_SPcombo_v2(
   #total_term is the summation of all possible terms
   #expand the total_term and drop the coefficients
 
-@show ori_n_q1 ori_n_q2 ori_n_q3
-
   total_term = zero(Basic)
-  for q1q2_xpt in 0:min(n_q1,n_q2)
+  for q1q2_xpt in 0:min(ori_n_q1,ori_n_q2)
     n_q1 = ori_n_q1
     n_q2 = ori_n_q2
     n_q3 = ori_n_q3
 
     n_q1 -= q1q2_xpt
     n_q2 -= q1q2_xpt
-@show q1q2_xpt n_q1 n_q2 n_q3
     for q1q3_xpt in 0:min(n_q1,n_q3)
       n_q1 -= q1q3_xpt
       n_q3 -= q1q3_xpt
-@show q1q3_xpt n_q1 n_q2 n_q3
       for q2q3_xpt in 0:min(n_q2,n_q3)
         n_q2 -= q2q3_xpt
         n_q3 -= q2q3_xpt
-@show q2q3_xpt n_q1 n_q2 n_q3
 
         max_q1q1_xpt = floor(Int,n_q1/2)
         max_q2q2_xpt = floor(Int,n_q2/2)
         max_q3q3_xpt = floor(Int,n_q3/2)
-@show max_q1q1_xpt max_q2q2_xpt max_q3q3_xpt 
 
         for q1q1_xpt in 0:max_q1q1_xpt, q2q2_xpt in 0:max_q2q2_xpt, q3q3_xpt in 0:max_q3q3_xpt
           q1ki_xpt = n_q1-2*q1q1_xpt
