@@ -23,7 +23,7 @@ export convert_to_array
 export make_SP
 export get_exponent
 export get_degree
-export drop_coeff, generate_SPcombo
+export drop_coeff, generate_SPcombo, gen_SPcombo_v2
 
 
 
