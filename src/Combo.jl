@@ -89,9 +89,9 @@ function gen_SPcombo_v2(
   @vars q1,q2,q3
   @funs SP
 
-  n_q1 = count( "q1", rank_str )
-  n_q2 = count( "q2", rank_str )
-  n_q3 = count( "q3", rank_str )
+  ori_n_q1 = count( "q1", rank_str )
+  ori_n_q2 = count( "q2", rank_str )
+  ori_n_q3 = count( "q3", rank_str )
 
   # term_q1ki = SP(q1,k1)+SP(q1,k2)+...
   term_q1ki = (sum∘map)( mom -> SP(q1,mom), ind_mom_list )
@@ -116,6 +116,10 @@ function gen_SPcombo_v2(
 
   total_term = zero(Basic)
   for q1q2_xpt in 0:min(n_q1,n_q2)
+    n_q1 = ori_n_q1
+    n_q2 = ori_n_q2
+    n_q3 = ori_n_q3
+
     n_q1 -= q1q2_xpt
     n_q2 -= q1q2_xpt
 @show q1q2_xpt n_q1 n_q2 n_q3
