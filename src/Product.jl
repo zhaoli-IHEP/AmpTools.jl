@@ -21,6 +21,10 @@ function make_SP( mom1::Basic, mom2::Basic )::Basic
 
   @funs SP
 
+  if iszero(mom1) || iszero(mom2)
+    return zero(Basic)
+  end # if
+
   mom1_array = convert_to_array( mom1 )
   mom2_array = convert_to_array( mom2 )
 
