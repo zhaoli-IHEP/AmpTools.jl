@@ -48,6 +48,7 @@ function get_exponent( ::Val{:Mul}, poly::Basic, x::Basic, op::Symbol = :Max )::
 end # function get_exponent
 
 
+
 ###################################################################
 """
     get_exponent( poly::Basic, x::Basic, op::Symbol = :Max )::Int64
@@ -75,6 +76,7 @@ function get_exponent( poly::Basic, x::Basic, op::Symbol = :Max )::Int64
   return get_exponent( Val(poly_class), poly, x, op )
 
 end # function get_exponent
+
 
 
 ###################################################################

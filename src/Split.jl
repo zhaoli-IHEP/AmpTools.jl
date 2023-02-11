@@ -8,7 +8,7 @@
 """
     convert_to_array( ::Val{:Symbol}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
 
-This specific convertion is applied only on single symbol momentum, e.g. `k1`.
+This specific conversion is applied only on single symbol momentum, e.g. `k1`.
 
 # Examples
 ```julia-repl
@@ -28,8 +28,6 @@ function convert_to_array( ::Val{:Symbol}, mom::Basic )::Array{NamedTuple{(:num,
   return NamedTuple{(:num,:ki),Tuple{Basic,Basic}}[ ( num=one(Basic), ki=mom ) ]
 
 end # function convert_to_array
-
-
 
 
 ###################################################
@@ -135,11 +133,35 @@ end # function convert_to_array
 
 
 #####################################################
-function get_add_vector( expr::Basic )::Vector{Basic}
+function get_add_vector_noexpand( expr::Basic )::Vector{Basic}
 #####################################################
 
   return SymEngine.get_symengine_class( expr ) == :Add ? get_args(expr) : Basic[ expr ]
 
-end # function get_add_vector
+end # function get_add_vector_noexpand
+
+#####################################################
+@inline get_add_vector_expand( expr::Basic )::Vector{Basic} = (get_add_vector_noexpand∘expand)(expr)
+#####################################################
+
+
+
+##########################
+function mul_by_term(
+    expr::Basic,
+    mul_fac::Basic
+)::Basic
+##########################
+
+  term_list = get_add_vector_expand(expr)
+  new_result = zero(Basic)
+  for one_term in term_list
+    new_result += one_term*mul_fac
+  end # for one_term
+
+  return new_result
+
+end # function mul_by_term
+
 
 

@@ -1,73 +1,62 @@
 
-###########################################
-gen_sorted_str( ::Val{:Symbol}, expr::Basic )::String = string(expr)
-gen_sorted_str( ::Val{:Integer}, expr::Basic )::String = string(expr)
-gen_sorted_str( ::Val{:Rational}, expr::Basic )::String = string(expr)
-gen_sorted_str( ::Val{:Complex}, expr::Basic )::String = string(expr)
-###########################################
 
-
-###########################################
-function gen_sorted_str( ::Val{:Pow}, expr::Basic )::String
-###########################################
-  arglist = get_args(expr)
-  return ":Pow( $(gen_sorted_str(arglist[1])), $(arglist[2]) )"
-end # function gen_sorted_str
-
-###########################################
-function gen_sorted_str( ::Val{:FunctionSymbol}, expr::Basic )::String
-###########################################
-  name = replace( get_name(expr), "Trace" => "DiracTrace" )
-  return "$(name)( $(join( map( gen_sorted_str, get_args(expr) ), "," )) )"
-end # function gen_sorted_str
-
-###########################################
-function gen_sorted_str( ::Val{:Mul}, expr::Basic )::String
-###########################################
-  return ":Mul( $(join( (sort∘map)( gen_sorted_str, get_args(expr) ), "," )) )"
-end # function gen_sorted_str
-
-###########################################
-function gen_sorted_str( ::Val{:Add}, expr::Basic )::String
-###########################################
-  return ":Add( $(join( (sort∘map)( gen_sorted_str, get_args(expr) ), "," )) )"
-end # function gen_sorted_str
- 
- 
-###########################################
+#####################################################################
 """
-    gen_sorted_str( expr::Basic )::String
- 
-This is a generic interface for different classes of the `expr`.
-And it will generate the sorted string format for the expression `expr`.
+    box_message( message::String; color=:light_cyan )::Nothing
+
+Return nothing.
 """
-function gen_sorted_str( expr::Basic )::String
-###########################################
- 
-  expr_class = SymEngine.get_symengine_class(expr)
-  return gen_sorted_str( Val(expr_class), expr )
- 
-end # function gen_sorted_str
- 
+function box_message( message::String; color=:light_cyan )::Nothing
+#####################################################################
+
+  line_list = filter( !isempty, split( message, "\n" ) )
+
+  len = (maximum∘map)( length, line_list ) 
+
+  line_list = map( x -> "[ $(x)$(" "^(len-length(x))) ]", line_list )
+
+  bar = "-"^(len+4)
+
+  new_message = join( line_list, "\n" )
+
+  printstyled( """
+
+  $bar
+  $(new_message)
+  $bar
+
+  """, color=color )
+
+  return nothing
+
+end # function box_message
 
 
-###############################
-function convert_to_String_dict(
-    dict::Dict{Basic,Basic}
-)::Dict{String,String}
-###############################
 
-  return (Dict∘map)( x -> string(x[1]) => string(x[2]), collect(dict) )
 
-end # function convert_to_String_dict
 
-###############################
-function convert_to_Basic_dict(
-    dict::Dict{String,String}
-)::Dict{Basic,Basic}
-###############################
 
-  return (Dict∘map)( x -> Basic(x[1]) => Basic(x[2]), collect(dict) )
+######################################
+#
+# Although it does not have relation with SymEngine,
+#   this function has been widely used in our projects.
+#
+function sequential_replace(
+    str::String,
+    rule_dict::Dict{String,String}
+)::String
+######################################
 
-end # function convert_to_Basic_dict
+  for one_rule in collect( rule_dict )
+    str = replace( str, one_rule )
+  end # for one_rule
+
+  return str
+
+end # function sequential_replace 
+
+
+
+
+
 

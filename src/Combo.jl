@@ -4,9 +4,31 @@ function drop_coeff( expr::Basic )::Basic
 #########################################
 
   return SymEngine.get_symengine_class( expr ) == :Mul ?
-         (prod∘filter)( x_-> SymEngine.get_symengine_class(x_) != :Integer, get_args(expr) ) : expr
+         (prod∘filter)( x_-> SymEngine.get_symengine_class(x_) ∉ [:Complex,:Integer,:Rational], get_args(expr) ) : expr
 
 end # function drop_coeff
+
+
+
+#########################################
+function drop_coeff_keep_im( expr::Basic )::Basic
+#########################################
+
+  if SymEngine.get_symengine_class( expr ) == :Mul
+    remove_integer_list = filter( x_-> SymEngine.get_symengine_class(x_) ∉ [:Integer,:Rational], get_args(expr) )
+    keep_im_list = map( x_-> SymEngine.get_symengine_class(x_) == :Complex ? im : x_, remove_integer_list )
+    return prod(keep_im_list)
+  else
+    return expr
+  end # if
+
+  return expr
+
+end # function drop_coeff_keep_im
+
+
+
+
 
 #########################################
 function generate_SPcombo(
@@ -65,7 +87,7 @@ function generate_SPcombo(
     end # for q1_q1_exp
   end # for q1_q2_exp
 
-  SP_list = (get_add_vector∘expand)(total_term)
+  SP_list = get_add_vector_expand(total_term)
   SP_list = sort( map(drop_coeff,SP_list), by=gen_sorted_str )
 
   return SP_list
@@ -146,7 +168,7 @@ function gen_SPcombo_v2(
     end # for q1q3_xpt
   end # for q1q2_xpt
 
-  SP_list = (get_add_vector∘expand)(total_term)
+  SP_list = get_add_vector_expand(total_term)
   SP_list = sort( map(drop_coeff,SP_list), by=gen_sorted_str )
 
   return SP_list

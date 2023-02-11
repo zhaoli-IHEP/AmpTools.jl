@@ -2,6 +2,25 @@ using SymEngine, SymEngineExt, Dates, Test
 
 @info "basicTest starts @ $(now())"
 
+@testset "drop_coeff" begin
+  @vars shat, x1, x2
+  @test drop_coeff( 2*shat*x1 ) == shat*x1
+  @test drop_coeff( 2//3*shat*x1 ) == shat*x1
+  @test drop_coeff( 2*im*shat*x1 ) == shat*x1
+  @test drop_coeff( 2//3*im*shat*x1 ) == shat*x1
+  @test drop_coeff( im*shat*x1 ) == shat*x1
+end # @testset
+
+@testset "drop_coeff_keep_im" begin
+  @vars shat, x1, x2
+  @test drop_coeff_keep_im( 2*shat*x1 ) == shat*x1
+  @test drop_coeff_keep_im( 2//3*shat*x1 ) == shat*x1
+  @test drop_coeff_keep_im( 2*im*shat*x1 ) == im*shat*x1
+  @test drop_coeff_keep_im( 2//3*im*shat*x1 ) == im*shat*x1
+  @test drop_coeff_keep_im( im*shat*x1 ) == im*shat*x1
+end # @testset
+
+
 @testset "get_degree" begin
   @vars x, y
   poly = 1+2*x+y*3*x^3
