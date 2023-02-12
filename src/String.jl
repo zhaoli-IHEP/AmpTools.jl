@@ -1,3 +1,9 @@
+#############################################################
+#
+# Although they do not have relation with SymEngine,
+#   the following functions have been widely used in our projects.
+#
+#############################################################
 
 
 #####################################################################
@@ -37,11 +43,7 @@ end # function box_message
 
 
 ######################################
-#
-# Although it does not have relation with SymEngine,
-#   this function has been widely used in our projects.
-#
-function sequential_replace(
+function seq_replace(
     str::String,
     rule_dict::Dict{String,String}
 )::String
@@ -53,9 +55,46 @@ function sequential_replace(
 
   return str
 
-end # function sequential_replace 
+end # function seq_replace 
+
+######################################
+function seq_replace(
+    str::String,
+    rule_list::Vector{Pair{String,String}}
+)::String
+######################################
+
+  for one_rule in rule_list 
+    str = replace( str, one_rule )
+  end # for one_rule
+
+  return str
+
+end # function seq_replace 
+
+######################################
+function seq_replace(
+    str::String,
+    rule_list...
+)::String
+######################################
+
+  for one_rule in rule_list 
+    str = replace( str, one_rule )
+  end # for one_rule
+
+  return str
+
+end # function seq_replace 
 
 
+
+
+############################################
+add_quote( str::Any )::String = "\"$str\""
+############################################
+add_quote( str_list::Vector{Any} )::Vector{String} = add_quote.(str_list)
+############################################
 
 
 

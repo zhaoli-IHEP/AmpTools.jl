@@ -37,6 +37,10 @@ function make_SP( mom1::Basic, mom2::Basic )::Basic
 
 end # function make_SP
 
+###########################################
+# Squared momentum 
+make_SP( mom::Basic ) = make_SP(mom,mom)
+###########################################
 
 
 

@@ -15,7 +15,7 @@ include("Lorentz.jl")
 include("Exponent.jl")
 include("Combo.jl")
 
-export box_message, sequential_replace
+export box_message, seq_replace, add_quote
 export is_FunctionSymbol
 export to_String_dict, to_Basic_dict
 export gen_sorted_str, gen_mma_str
