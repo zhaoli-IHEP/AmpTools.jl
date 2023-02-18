@@ -97,5 +97,18 @@ add_quote( str_list::Vector{Any} )::Vector{String} = add_quote.(str_list)
 ############################################
 
 
+###############################################
+# backup before mkdir
+function bk_mkdir( dir_name::String )::Nothing
+###############################################
+  
+  if isdir( dir_name )
+    mv( dir_name, "$(dir_name)_$(now())" )
+  end # if
+  mkdir( dir_name )
+
+  return nothing
+
+end # function bk_mkdir
 
 

@@ -3,6 +3,7 @@ __precompile__()
 
 module SymEngineExt
 
+using Dates
 using SymEngine
 
 
@@ -15,17 +16,17 @@ include("Lorentz.jl")
 include("Exponent.jl")
 include("Combo.jl")
 
-export box_message, seq_replace, add_quote
+export box_message, seq_replace, add_quote, bk_mkdir
 export is_FunctionSymbol
-export to_String_dict, to_Basic_dict
+export to_String_dict, to_Basic_dict, to_Basic_list
 export gen_sorted_str, gen_mma_str
 export get_add_vector_noexpand, get_add_vector_expand
 export mul_by_term
 export convert_to_array
-export make_SP, make_FV, split_SP, recover_SP
+export make_SP, make_FV, split_SP, recover_SP, has_Trace5
 export get_exponent
 export get_degree
-export drop_coeff, drop_coeff_keep_im
+export split_coeff, drop_coeff, drop_coeff_keep_im
 export generate_SPcombo, gen_SPcombo_v2
 export iszero_numerical
 export get_det, get_adj, get_dot

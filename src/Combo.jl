@@ -1,4 +1,53 @@
 
+
+
+##########################
+function split_coeff( 
+    expr::Basic 
+)::Tuple{Basic,Basic}
+##########################
+
+  expr_class = SymEngine.get_symengine_class( expr )
+  if expr_class != :Mul
+    if expr_class ∈ [:Complex,:Integer,:Rational] 
+      return expr, one(Basic)
+    else
+      return one(Basic), expr
+    end # if
+  else # == :Mul
+    factor_list = get_args(expr)
+    coeff_expr = one(Basic)
+    trimmed_expr = one(Basic)
+    for one_factor in factor_list 
+      if SymEngine.get_symengine_class(one_factor) ∈ [:Complex,:Integer,:Rational]
+        coeff_expr *= one_factor
+      else
+        trimmed_expr *= one_factor
+      end # if
+    end # for one_factor
+    return coeff_expr, trimmed_expr
+  end # if
+
+end # function split_coeff
+
+
+##########################
+function split_coeff( 
+    expr_list::Vector{Basic} 
+)::Tuple{Vector{Basic},Vector{Basic}}
+##########################
+
+  coeff_list = zeros( Basic, length(expr_list) )
+  remnant_list = zeros( Basic, length(expr_list) )
+
+  for index in 1:length(expr_list)
+    coeff_list[index], remnant_list[index] = split_coeff(expr_list[index])
+  end # for index
+
+  return coeff_list, remnant_list
+
+end # function split_coeff
+
 #########################################
 function drop_coeff( expr::Basic )::Basic
 #########################################

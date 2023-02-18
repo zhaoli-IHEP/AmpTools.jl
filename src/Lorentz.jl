@@ -157,4 +157,28 @@ end # function recover_SP
 
 
 
+##################################
+# check if the Lorentz expression contains Trace and PL/PR in the Trace
+function has_Trace5(
+    expr::Basic
+)::Bool
+##################################
+
+  trace_list = filter( x-> get_name(x) == "Trace", function_symbols(expr) )
+
+  if isempty(trace_list)
+    return false
+  end # if
+  
+  @vars PL, PR
+  for one_trace in trace_list
+    arg_list = get_args(one_trace)
+    if PL ∈ arg_list || PR ∈ arg_list
+      return true
+    end # if
+  end # for one_trace
+
+  return false
+
+end # function has_Trace5
 
