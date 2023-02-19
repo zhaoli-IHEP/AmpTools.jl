@@ -91,9 +91,9 @@ end # function seq_replace
 
 
 ############################################
-add_quote( str::Any )::String = "\"$str\""
+@inline add_quote( str::Any )::String = "\"$str\""
 ############################################
-add_quote( str_list::Vector{Any} )::Vector{String} = add_quote.(str_list)
+@inline add_quote( str_list::Vector{Any} )::Vector{String} = add_quote.(str_list)
 ############################################
 
 
@@ -110,5 +110,7 @@ function bk_mkdir( dir_name::String )::Nothing
   return nothing
 
 end # function bk_mkdir
+
+
 
 

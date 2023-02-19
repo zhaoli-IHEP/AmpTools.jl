@@ -103,8 +103,10 @@ end # function to_Basic_dict
 
 
 ##############################################################
-to_Basic_list( str_list::Vector{String} )::Vector{Basic} = map( Basic, str_list )
-##############################################################
+@inline to_Basic( str_list::Vector{String} )::Vector{Basic} = map( Basic, str_list )
+##############################################
+@inline to_String( ex_list::Vector{Basic} )::Vector{String} = map( string, ex_list )
+##############################################
 
 
 ###########################################
