@@ -21,6 +21,25 @@ end # @testset
 end # @testset
 
 
+@testset "get_det" begin
+  for dim ∈ 1:9
+    if dim == 1
+      tmp_mat = Matrix{Basic}(undef, 1, 1)
+      tmp_mat[1, 1] = Basic("x_1_1")
+    else
+      tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
+    end
+
+    diff_result = get_det(tmp_mat)
+    for perm ∈ permutations(1:dim)
+      σ = (iseven ∘ parity)(perm) ? 1 : -1
+      diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
+    end
+    @test (iszero ∘ expand)(diff_result)
+  end
+end
+
+
 @testset "get_degree" begin
   @vars x, y
   poly = 1+2*x+y*3*x^3
