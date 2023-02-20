@@ -1,4 +1,4 @@
-using SymEngine, SymEngineExt, Dates, Test  
+using Combinatorics, LinearAlgebra, SymEngine, SymEngineExt, Dates, Test  
 
 @info "basicTest starts @ $(now())"
 
@@ -19,6 +19,45 @@ end # @testset
   @test drop_coeff_keep_im( 2//3*im*shat*x1 ) == im*shat*x1
   @test drop_coeff_keep_im( im*shat*x1 ) == im*shat*x1
 end # @testset
+
+
+@testset "get_det" begin
+  for dim ∈ 1:8
+    if dim == 1
+      tmp_mat = Matrix{Basic}(undef, 1, 1)
+      tmp_mat[1, 1] = Basic("x_1_1")
+    else
+      tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
+    end
+
+    diff_result = get_det(tmp_mat)
+    for perm ∈ permutations(1:dim)
+      σ = (iseven ∘ parity)(perm) ? 1 : -1
+      diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
+    end
+    @test (iszero ∘ expand)(diff_result)
+  end
+
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    @test det(tmp_mat) == get_det(tmp_mat)
+  end
+end
+
+
+@testset "get_adj" begin
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    det_tmp_mat = det(tmp_mat)
+    while iszero(det_tmp_mat)
+      tmp_mat = rand(Basic.(0:100), dim, dim)
+      det_tmp_mat = det(tmp_mat)
+    end
+
+    inv_tmp_mat = inv(tmp_mat)
+    @test get_adj(tmp_mat) == det_tmp_mat * inv_tmp_mat
+  end
+end
 
 
 @testset "get_degree" begin
