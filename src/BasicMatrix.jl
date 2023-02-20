@@ -107,7 +107,7 @@ function get_adj( MM::Matrix{Basic} )::Matrix{Basic}
   @assert nr == nc
 
   if nr == 1
-    return one(Basic)
+    return ones(Basic, 1, 1)
   end # if
 
   if nr == 2

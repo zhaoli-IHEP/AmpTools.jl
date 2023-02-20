@@ -45,6 +45,21 @@ end # @testset
 end
 
 
+@testset "get_adj" begin
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    det_tmp_mat = det(tmp_mat)
+    while iszero(det_tmp_mat)
+      tmp_mat = rand(Basic.(0:100), dim, dim)
+      det_tmp_mat = det(tmp_mat)
+    end
+
+    inv_tmp_mat = inv(tmp_mat)
+    @test get_adj(tmp_mat) == det_tmp_mat * inv_tmp_mat
+  end
+end
+
+
 @testset "get_degree" begin
   @vars x, y
   poly = 1+2*x+y*3*x^3
