@@ -1,4 +1,4 @@
-using SymEngine, SymEngineExt, Dates, Test  
+using Combinatorics, LinearAlgebra, SymEngine, SymEngineExt, Dates, Test  
 
 @info "basicTest starts @ $(now())"
 
@@ -22,7 +22,7 @@ end # @testset
 
 
 @testset "get_det" begin
-  for dim ∈ 1:9
+  for dim ∈ 1:8
     if dim == 1
       tmp_mat = Matrix{Basic}(undef, 1, 1)
       tmp_mat[1, 1] = Basic("x_1_1")
@@ -36,6 +36,11 @@ end # @testset
       diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
     end
     @test (iszero ∘ expand)(diff_result)
+  end
+
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    @test det(tmp_mat) == get_det(tmp_mat)
   end
 end
 
