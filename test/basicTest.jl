@@ -21,6 +21,30 @@ end # @testset
 end # @testset
 
 
+@testset "get_det_old" begin
+  for dim ∈ 1:8
+    if dim == 1
+      tmp_mat = Matrix{Basic}(undef, 1, 1)
+      tmp_mat[1, 1] = Basic("x_1_1")
+    else
+      tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
+    end
+
+    diff_result = SymEngineExt.get_det_old(tmp_mat)
+    for perm ∈ permutations(1:dim)
+      σ = (iseven ∘ parity)(perm) ? 1 : -1
+      diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
+    end
+    @test (iszero ∘ expand)(diff_result)
+  end
+
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    @test det(tmp_mat) == SymEngineExt.get_det_old(tmp_mat)
+  end
+end
+
+
 @testset "get_det" begin
   for dim ∈ 1:8
     if dim == 1
@@ -30,7 +54,7 @@ end # @testset
       tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
     end
 
-    diff_result = get_det(tmp_mat)
+    diff_result = SymEngineExt.get_det(tmp_mat)
     for perm ∈ permutations(1:dim)
       σ = (iseven ∘ parity)(perm) ? 1 : -1
       diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
@@ -40,43 +64,19 @@ end # @testset
 
   for dim ∈ 1:10
     tmp_mat = rand(Basic.(0:100), dim, dim)
-    @test det(tmp_mat) == get_det(tmp_mat)
+    @test det(tmp_mat) == SymEngineExt.get_det(tmp_mat)
   end
 end
 
 
-@testset "get_det_new" begin
-  for dim ∈ 1:8
-    if dim == 1
-      tmp_mat = Matrix{Basic}(undef, 1, 1)
-      tmp_mat[1, 1] = Basic("x_1_1")
-    else
-      tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
-    end
-
-    diff_result = SymEngineExt.get_det_new(tmp_mat)
-    for perm ∈ permutations(1:dim)
-      σ = (iseven ∘ parity)(perm) ? 1 : -1
-      diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
-    end
-    @test (iszero ∘ expand)(diff_result)
-  end
-
-  for dim ∈ 1:10
-    tmp_mat = rand(Basic.(0:100), dim, dim)
-    @test det(tmp_mat) == SymEngineExt.get_det_new(tmp_mat)
-  end
-end
-
-
-@testset "`get_det` vs. `get_det_new`" begin
+@testset "`get_det_old` vs. `get_det`" begin
   for dim ∈ 1:10
     tmp_mat = rand(Basic.(-100:100), dim, dim)
     println("For $dim dimensional numeric matrix.")
-    println("Original `get_det`:")
-    @btime get_det($tmp_mat)
-    println("Bisection `get_det_new`:")
-    @btime SymEngineExt.get_det_new($tmp_mat)
+    println("Original `get_det_old`:")
+    @btime SymEngineExt.get_det_old($tmp_mat)
+    println("Bisection `get_det`:")
+    @btime SymEngineExt.get_det($tmp_mat)
     println()
   end
 
@@ -89,10 +89,10 @@ end
       reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
     end
     println("For $dim dimensional symbolic matrix.")
-    println("Original `get_det`:")
-    @btime get_det($tmp_mat)
-    println("Bisection `get_det_new`:")
-    @btime SymEngineExt.get_det_new($tmp_mat)
+    println("Original `get_det_old`:")
+    @btime SymEngineExt.get_det_old($tmp_mat)
+    println("Bisection `get_det`:")
+    @btime SymEngineExt.get_det($tmp_mat)
     println()
   end
   @test true

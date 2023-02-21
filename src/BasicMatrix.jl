@@ -1,29 +1,9 @@
 
+
+
 ############################################
+# Created by Quan-feng Wu, Feb 21, 2023
 function get_det_old( MM::Matrix{Basic} )::Basic
-############################################
-
-  nr, nc = size(MM)
-  @assert nr == nc
-
-  if nr == 1
-    detMM = MM[1,1]
-  elseif nr == 2 
-    detMM = MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
-  elseif nr == 3
-    detMM = MM[1,1]*MM[2,2]*MM[3,3]-MM[1,1]*MM[2,3]*MM[3,2]-MM[1,2]*MM[2,1]*MM[3,3]+
-            MM[1,2]*MM[2,3]*MM[3,1]+MM[1,3]*MM[2,1]*MM[3,2]-MM[1,3]*MM[2,2]*MM[3,1]
-  else
-    error( "Larger nr is not expected!" )
-  end # if
-
-  return detMM
-
-end # function get_det_old
-
-
-############################################
-function get_det( MM::Matrix{Basic} )::Basic
 ############################################
 
   nr, nc = size(MM)
@@ -44,16 +24,17 @@ function get_det( MM::Matrix{Basic} )::Basic
     element = MM[1,cc]
     cofactor = (-1)^(1+cc)
     sub_mat = MM[ 2:nr, setdiff(1:nc,cc) ]
-    detMM += element * cofactor * get_det(sub_mat)
+    detMM += element * cofactor * get_det_old(sub_mat)
   end # for cc
 
   return detMM
 
-end # function get_det
+end # function get_det_old
 
 
 ############################################
-function get_det_new( MM::Matrix{Basic} )::Basic
+# Created by Quan-feng Wu, Feb 21, 2023
+function get_det( MM::Matrix{Basic} )::Basic
 ############################################
 
   nr, nc = size(MM)
@@ -68,14 +49,16 @@ function get_det_new( MM::Matrix{Basic} )::Basic
   end
 
   det = 0
-  sub_dim = (Int ∘ floor)(nr / 2)
-  for selected_cols ∈ combinations(1:nc, sub_dim)
+  sub_dim = (Int∘floor)(nr / 2)
+  for selected_cols in combinations(1:nc, sub_dim)
     cofactor = (-1)^(sum(1:sub_dim) + sum(selected_cols))
-    det += get_det_new( MM[1:sub_dim, selected_cols] ) * cofactor *
-      get_det_new( MM[sub_dim+1:end, setdiff(1:nc, selected_cols)] )
-  end
+    det += get_det( MM[1:sub_dim, selected_cols] ) * cofactor *
+      get_det( MM[sub_dim+1:end, setdiff(1:nc, selected_cols)] )
+  end # for selected_cols
+
   return  det
-end # function get_det_new
+
+end # function get_det
 
 
 ####################################################
