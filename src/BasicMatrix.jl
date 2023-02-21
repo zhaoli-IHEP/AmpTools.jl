@@ -52,6 +52,30 @@ function get_det( MM::Matrix{Basic} )::Basic
 end # function get_det
 
 
+############################################
+function get_det_new( MM::Matrix{Basic} )::Basic
+############################################
+
+  nr, nc = size(MM)
+  @assert nr == nc
+
+  if nr == 1
+    return MM[1, 1]
+  end
+
+  if nr == 2
+    return MM[1, 1] * MM[2, 2] - MM[1, 2] * MM[2, 1]
+  end
+
+  det = 0
+  sub_dim = (Int ∘ floor)(nr / 2)
+  for selected_cols ∈ combinations(1:nc, sub_dim)
+    cofactor = (-1)^(sum(1:sub_dim) + sum(selected_cols))
+    det += get_det_new( MM[1:sub_dim, selected_cols] ) * cofactor *
+      get_det_new( MM[sub_dim+1:end, setdiff(1:nc, selected_cols)] )
+  end
+  return  det
+end # function get_det_new
 
 
 ####################################################
