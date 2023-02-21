@@ -5,6 +5,7 @@ module SymEngineExt
 
 using Combinatorics
 using Dates
+using SHA
 using SymEngine
 
 
@@ -31,6 +32,7 @@ export split_coeff, drop_coeff, drop_coeff_keep_im
 export generate_SPcombo, gen_SPcombo_v2
 export iszero_numerical
 export get_det, get_adj, get_dot
+export calc_sha256_file, calc_sha256_dir
 
 
 
