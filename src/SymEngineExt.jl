@@ -3,6 +3,7 @@ __precompile__()
 
 module SymEngineExt
 
+using Combinatorics
 using Dates
 using SymEngine
 

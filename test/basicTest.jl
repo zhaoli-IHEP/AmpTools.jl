@@ -1,4 +1,4 @@
-using Combinatorics, LinearAlgebra, SymEngine, SymEngineExt, Dates, Test  
+using BenchmarkTools, Combinatorics, LinearAlgebra, SymEngine, SymEngineExt, Dates, Test  
 
 @info "basicTest starts @ $(now())"
 
@@ -42,6 +42,60 @@ end # @testset
     tmp_mat = rand(Basic.(0:100), dim, dim)
     @test det(tmp_mat) == get_det(tmp_mat)
   end
+end
+
+
+@testset "get_det_new" begin
+  for dim ∈ 1:8
+    if dim == 1
+      tmp_mat = Matrix{Basic}(undef, 1, 1)
+      tmp_mat[1, 1] = Basic("x_1_1")
+    else
+      tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
+    end
+
+    diff_result = SymEngineExt.get_det_new(tmp_mat)
+    for perm ∈ permutations(1:dim)
+      σ = (iseven ∘ parity)(perm) ? 1 : -1
+      diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
+    end
+    @test (iszero ∘ expand)(diff_result)
+  end
+
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(0:100), dim, dim)
+    @test det(tmp_mat) == SymEngineExt.get_det_new(tmp_mat)
+  end
+end
+
+
+@testset "`get_det` vs. `get_det_new`" begin
+  for dim ∈ 1:10
+    tmp_mat = rand(Basic.(-100:100), dim, dim)
+    println("For $dim dimensional numeric matrix.")
+    println("Original `get_det`:")
+    @btime get_det($tmp_mat)
+    println("Bisection `get_det_new`:")
+    @btime SymEngineExt.get_det_new($tmp_mat)
+    println()
+  end
+
+  for dim ∈ 1:8
+    tmp_mat = if dim == 1
+      mat = Matrix{Basic}(undef, 1, 1)
+      mat[1, 1] = Basic("x_1_1")
+      mat
+    else
+      reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
+    end
+    println("For $dim dimensional symbolic matrix.")
+    println("Original `get_det`:")
+    @btime get_det($tmp_mat)
+    println("Bisection `get_det_new`:")
+    @btime SymEngineExt.get_det_new($tmp_mat)
+    println()
+  end
+  @test true
 end
 
 
