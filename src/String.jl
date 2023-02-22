@@ -114,7 +114,7 @@ end # function bk_mkdir
 
 
 ########################
-function calc_sha256_file( 
+function calc_sha256( 
     file_name::String 
 )::String
 ########################
@@ -125,26 +125,25 @@ function calc_sha256_file(
 
   return sha_code
 
-end # function calc_sha256_file
+end # function calc_sha256
 
 
 ########################
-function calc_sha256_dir( 
-    dir_name::String 
+function calc_sha256( 
+    file_name_list::Vector{String} 
 )::String
 ########################
 
-  file_list = readdir(dir_name)
   code_list = Vector{String}()
-  for file_name in file_list
-    file = open( "$(dir_name)/$(file_name)", "r" )
+  for file_name in file_name_list
+    file = open( file_name, "r" )
     push!( code_list, (bytes2hex∘sha256)(file) )
     close( file )
   end # for file_name
 
   return (bytes2hex∘sha256∘prod∘sort)(code_list)
 
-end # function calc_sha256_dir
+end # function calc_sha256
 
 
 
