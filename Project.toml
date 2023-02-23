@@ -1,4 +1,4 @@
-name = "SymEngineExt"
+name = "AmpTools"
 uuid = "eb43aea2-30a6-470d-b25b-3f3789752db4"
 authors = ["zhaoli-IHEP <zhaoli@ihep.ac.cn>"]
 version = "0.1.0"
