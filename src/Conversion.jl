@@ -57,6 +57,10 @@ function to_String_dict(
 )::Dict{String,String}
 ###############################
 
+  if isempty(dict)
+    return Dict{String,String}()
+  end # if
+
   return (Dict∘map)( x -> string(x[1]) => string(x[2]), collect(dict) )
 
 end # function to_String_dict
@@ -66,6 +70,10 @@ function to_Basic_dict(
     dict::Dict{String,String}
 )::Dict{Basic,Basic}
 ###############################
+
+  if isempty(dict)
+    return Dict{Basic,Basic}()
+  end # if
 
   return (Dict∘map)( x -> Basic(x[1]) => Basic(x[2]), collect(dict) )
 

@@ -1,7 +1,7 @@
 __precompile__()
 
 
-module SymEngineExt
+module AmpTools
 
 using Combinatorics
 using Dates
@@ -35,17 +35,13 @@ export get_det, get_adj, get_dot
 export calc_sha256
 
 
-
-
-
-
 ###################
 function __init__()
 ###################
   return nothing
 end # function __init__
 
-end # module SymEngineExt
+end # module AmpTools
 
 
 
