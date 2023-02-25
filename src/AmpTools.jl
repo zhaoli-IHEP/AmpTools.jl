@@ -19,7 +19,7 @@ include("Exponent.jl")
 include("Combo.jl")
 
 export box_message, seq_replace, add_quote, bk_mkdir
-export is_FunctionSymbol
+export is_FunctionSymbol, is_class
 export to_String_dict, to_Basic_dict, to_Basic, to_String
 export gen_sorted_str, gen_mma_str
 export get_add_vector_noexpand, get_add_vector_expand

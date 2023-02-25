@@ -1,16 +1,21 @@
 
 
-
-
-####################
-function is_FunctionSymbol(
+#############################
+@inline function is_FunctionSymbol(
     expr::Basic
 )::Bool
-####################
-
-  return SymEngine.get_symengine_class(expr) == :FunctionSymbol
-
+#############################
+  return SymEngine.get_symengine_class(expr) == :FunctionSymbol 
 end # function is_FunctionSymbol
+
+#############################
+@inline function is_class(
+    class::Symbol,
+    expr::Basic
+)::Bool
+#############################
+  return SymEngine.get_symengine_class(expr) == class
+end # function is_class
 
 
 ############################
