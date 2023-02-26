@@ -25,7 +25,7 @@ export gen_sorted_str, gen_mma_str
 export get_add_vector_noexpand, get_add_vector_expand
 export mul_by_term
 export convert_to_array
-export make_SP, make_FV, split_SP, recover_SP, has_Trace5
+export make_SP, make_FV, split_SP, recover_SP
 export get_exponent
 export get_degree
 export split_coeff, drop_coeff, drop_coeff_keep_im
