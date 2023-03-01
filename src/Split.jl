@@ -6,7 +6,10 @@
 
 ###################################################
 """
-    convert_to_array( ::Val{:Symbol}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+    convert_to_array( 
+        ::Val{:Symbol}, 
+        mom::Basic 
+    )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
 
 This specific conversion is applied only on single symbol momentum, e.g. `k1`.
 
@@ -22,7 +25,10 @@ julia> FeAmGen.convert_to_array(k1)
  (num = 1, ki = k1)
 ```
 """
-function convert_to_array( ::Val{:Symbol}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+function convert_to_array( 
+    ::Val{:Symbol}, 
+    mom::Basic 
+)::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
 ###################################################
 
   return NamedTuple{(:num,:ki),Tuple{Basic,Basic}}[ ( num=one(Basic), ki=mom ) ]
@@ -32,7 +38,10 @@ end # function convert_to_array
 
 ###################################################
 """
-    convert_to_array( ::Val{:Mul}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+    convert_to_array( 
+        ::Val{:Mul}, 
+        mom::Basic 
+    )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
  
 This specific convertion is applied only on non-unit coefficient with single symbol momentum, e.g. `2*k1`.
  
@@ -48,7 +57,10 @@ julia> FeAmGen.convert_to_array(2*k1)
  (num = 2, ki = k1)
 ```
 """
-function convert_to_array( ::Val{:Mul}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+function convert_to_array( 
+    ::Val{:Mul}, 
+    mom::Basic 
+)::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
 ###################################################
  
   arg_list = get_args(mom)
@@ -62,7 +74,10 @@ end # function convert_to_array
 
 ###################################################
 """
-    convert_to_array( ::Val{:Add}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+    convert_to_array( 
+        ::Val{:Add}, 
+         mom::Basic 
+    )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
  
 This specific convertion is applied only on the summation of non-unit coefficient with single symbol momentum, e.g. `2*k1+3*k2+k3`.
  
@@ -80,7 +95,10 @@ julia> FeAmGen.convert_to_array(2*k1+3*k2+k3)
  (num = 3, ki = k2)
 ```
 """
-function convert_to_array( ::Val{:Add}, mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
+function convert_to_array( 
+    ::Val{:Add}, 
+    mom::Basic 
+)::Array{NamedTuple{(:num, :ki),Tuple{Basic,Basic}}}
 ###################################################
  
   arg_list = get_args(mom)
@@ -90,7 +108,7 @@ function convert_to_array( ::Val{:Add}, mom::Basic )::Array{NamedTuple{(:num, :k
   return map( arg_list ) do solo_mom
  
     solo_arg_list = get_args(solo_mom)
-    @assert length(solo_arg_list) == 2 || SymEngine.get_symengine_class(solo_mom) == :Symbol
+    @assert length(solo_arg_list) == 2 || is_class(:Symbol,solo_mom) 
  
     if length(solo_arg_list) == 2
  
@@ -136,13 +154,21 @@ end # function convert_to_array
 function get_add_vector_noexpand( expr::Basic )::Vector{Basic}
 #####################################################
 
-  return SymEngine.get_symengine_class( expr ) == :Add ? get_args(expr) : Basic[ expr ]
+  return is_class( :Add, expr ) ? get_args(expr) : Basic[ expr ]
 
 end # function get_add_vector_noexpand
 
 #####################################################
 @inline get_add_vector_expand( expr::Basic )::Vector{Basic} = (get_add_vector_noexpand∘expand)(expr)
 #####################################################
+
+#######################################################
+function get_mul_vector( expr::Basic )::Vector{Basic}
+#######################################################
+
+  return is_class( :Mul, expr ) ? get_args(expr) : Basic[ expr ]
+
+end # function get_mul_vector
 
 
 

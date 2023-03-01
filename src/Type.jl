@@ -9,6 +9,16 @@
 end # function is_FunctionSymbol
 
 #############################
+@inline function is_number(
+    expr::Basic
+)::Bool
+#############################
+  return SymEngine.get_symengine_class(expr) in [:Integer,:Rational,:Complex]
+end # function is_number
+
+
+
+#############################
 @inline function is_class(
     class::Symbol,
     expr::Basic
@@ -16,6 +26,8 @@ end # function is_FunctionSymbol
 #############################
   return SymEngine.get_symengine_class(expr) == class
 end # function is_class
+
+
 
 
 ############################
