@@ -20,7 +20,7 @@ include("Combo.jl")
 
 export box_message, seq_replace, add_quote, bk_mkdir
 export is_FunctionSymbol, is_number, is_class
-export to_String_dict, to_Basic_dict, to_Basic, to_String
+export to_String_dict, to_Basic_dict, to_Basic, to_String, subs_im
 export gen_sorted_str, gen_mma_str
 export get_add_vector_noexpand, get_add_vector_expand, get_mul_vector
 export mul_by_term
