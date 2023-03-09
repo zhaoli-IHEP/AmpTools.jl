@@ -89,8 +89,8 @@ function to_Basic_dict(
 
   new_dict = Dict{Basic,Basic}()
   for (key_str,val_str) in collect(dict)
-    key_ex = (subs_im∘Basic)(key)
-    val_ex = (subs_im∘Basic)(val)
+    key_ex = (subs_im∘Basic)(key_str)
+    val_ex = (subs_im∘Basic)(val_str)
     push!( new_dict, key_ex => val_ex )
   end # for key_str, val_str
 
@@ -111,8 +111,8 @@ function to_Basic_dict(
 
   new_dict = Dict{Basic,Basic}()
   for (key_str,val_str) in collect(dict)
-    key_ex = (subs_im∘Basic∘string)(key)
-    val_ex = (subs_im∘Basic∘string)(val)
+    key_ex = (subs_im∘Basic∘string)(key_str)
+    val_ex = (subs_im∘Basic∘string)(val_str)
     push!( new_dict, key_ex => val_ex )
   end # for key_str, val_str
 
@@ -138,8 +138,8 @@ function to_Basic_dict(
     @assert length(one_pair) == 2
     key_str = one_pair[1]
     val_str = one_pair[2]
-    key_ex = (subs_im∘Basic∘string)(key)
-    val_ex = (subs_im∘Basic∘string)(val)
+    key_ex = (subs_im∘Basic∘string)(key_str)
+    val_ex = (subs_im∘Basic∘string)(val_str)
     push!( result_dict, key_ex => val_ex )
   end # for one_pair
 
