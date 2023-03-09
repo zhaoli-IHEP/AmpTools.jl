@@ -91,7 +91,7 @@ function to_Basic_dict(
   for (key_str,val_str) in collect(dict)
     key_ex = (subs_im∘Basic)(key)
     val_ex = (subs_im∘Basic)(val)
-    push!( new_dict key_ex => val_ex )
+    push!( new_dict, key_ex => val_ex )
   end # for key_str, val_str
 
   return new_dict
@@ -113,7 +113,7 @@ function to_Basic_dict(
   for (key_str,val_str) in collect(dict)
     key_ex = (subs_im∘Basic∘string)(key)
     val_ex = (subs_im∘Basic∘string)(val)
-    push!( new_dict key_ex => val_ex )
+    push!( new_dict, key_ex => val_ex )
   end # for key_str, val_str
 
   return new_dict
