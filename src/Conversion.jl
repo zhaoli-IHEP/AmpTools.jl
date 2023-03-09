@@ -51,6 +51,7 @@ end # function gen_sorted_str
  
 
 
+
 ###############################
 function to_String_dict(
     dict::Dict{Basic,Basic}
@@ -65,6 +66,17 @@ function to_String_dict(
 
 end # function to_String_dict
 
+
+###################
+function subs_im( 
+    expr::Basic
+)::Basic
+###################
+
+  return subs( expr, Basic("im") => im )
+
+end # function subs_im
+
 ###############################
 function to_Basic_dict(
     dict::Dict{String,String}
@@ -75,7 +87,14 @@ function to_Basic_dict(
     return Dict{Basic,Basic}()
   end # if
 
-  return (Dict∘map)( x -> Basic(x[1]) => Basic(x[2]), collect(dict) )
+  new_dict = Dict{Basic,Basic}()
+  for (key_str,val_str) in collect(dict)
+    key_ex = (subs_im∘Basic)(key)
+    val_ex = (subs_im∘Basic)(val)
+    push!( new_dict key_ex => val_ex )
+  end # for key_str, val_str
+
+  return new_dict
 
 end # function to_Basic_dict
 
@@ -86,7 +105,19 @@ function to_Basic_dict(
 )::Dict{Basic,Basic}
 ###############################
 
-  return (Dict∘map)( x -> (Basic∘string)(x[1]) => (Basic∘string)(x[2]), collect(dict) )
+  if isempty(dict)
+    return Dict{Basic,Basic}()
+  end # if
+
+  new_dict = Dict{Basic,Basic}()
+  for (key_str,val_str) in collect(dict)
+    key_ex = (subs_im∘Basic∘string)(key)
+    val_ex = (subs_im∘Basic∘string)(val)
+    push!( new_dict key_ex => val_ex )
+  end # for key_str, val_str
+
+  return new_dict
+  #return (Dict∘map)( x -> (Basic∘string)(x[1]) => (Basic∘string)(x[2]), collect(dict) )
 
 end # function to_Basic_dict
 
@@ -98,10 +129,18 @@ function to_Basic_dict(
 )::Dict{Basic,Basic}
 ################################
 
+  if isempty(dict)
+    return Dict{Basic,Basic}()
+  end # if
+
   result_dict = Dict{Basic,Basic}()
   for one_pair in dict_list
     @assert length(one_pair) == 2
-    push!( result_dict, Basic(one_pair[1]) => Basic(one_pair[2]) )
+    key_str = one_pair[1]
+    val_str = one_pair[2]
+    key_ex = (subs_im∘Basic∘string)(key)
+    val_ex = (subs_im∘Basic∘string)(val)
+    push!( result_dict, key_ex => val_ex )
   end # for one_pair
 
   return result_dict
@@ -111,7 +150,7 @@ end # function to_Basic_dict
 
 
 ##############################################################
-@inline to_Basic( str_list::Vector{String} )::Vector{Basic} = map( Basic, str_list )
+@inline to_Basic( str_list::Vector{String} )::Vector{Basic} = map( subs_im∘Basic, str_list )
 ##############################################
 @inline to_String( ex_list::Vector{Basic} )::Vector{String} = map( string, ex_list )
 ##############################################
