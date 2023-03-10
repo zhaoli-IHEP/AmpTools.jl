@@ -16,8 +16,10 @@ include("String.jl")
 include("Split.jl")
 include("Lorentz.jl")
 include("Exponent.jl")
+include("Groebner.jl")
 include("Combo.jl")
 
+export get_Groebner_basis
 export box_message, seq_replace, add_quote, bk_mkdir
 export is_FunctionSymbol, is_number, is_class
 export to_String_dict, to_Basic_dict, to_Basic, to_String, subs_im

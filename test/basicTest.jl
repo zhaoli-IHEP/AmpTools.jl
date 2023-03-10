@@ -197,5 +197,24 @@ end # @testset
 
 end # @testset
 
+
+
+@testset "get_Groebner_basis" begin
+
+  @vars x, y
+  f = x^3 − 2*x*y 
+  g = x^2*y − 2*y^2 + x
+  bench = [-2*x*y + x^3, x + x^2*y - 2*y^2, -x^2, -2*x*y, x - 2*y^2]
+  @test get_Groebner_basis( [f, g], [x,y] ) == bench
+
+end # @testset
+
+
+
+
+
 @info "basicTest ends @ $(now())"
+
+
+
 
