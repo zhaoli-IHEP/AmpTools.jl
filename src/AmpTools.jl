@@ -3,8 +3,10 @@ __precompile__()
 
 module AmpTools
 
+using AbstractAlgebra
 using Combinatorics
 using Dates
+using Groebner
 using SHA
 using SymEngine
 
@@ -19,7 +21,7 @@ include("Exponent.jl")
 include("Groebner.jl")
 include("Combo.jl")
 
-export get_Groebner_basis
+export get_Groebner_basis, get_Groebner_basis_v2
 export box_message, seq_replace, add_quote, bk_mkdir
 export is_FunctionSymbol, is_number, is_class
 export to_String_dict, to_Basic_dict, to_Basic, to_String, subs_im

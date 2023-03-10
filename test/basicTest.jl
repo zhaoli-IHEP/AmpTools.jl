@@ -21,6 +21,17 @@ end # @testset
 end # @testset
 
 
+@testset "get_Groebner_basis" begin
+
+  @vars x, y
+  f = x^3 − 2*x*y 
+  g = x^2*y − 2*y^2 + x
+  bench = [y^3, x - 2*y^2]
+  gb = get_Groebner_basis_v2( [f, g], [x,y] ) 
+  @test gb == bench
+
+end # @testset
+
 @testset "get_det_old" begin
   for dim ∈ 1:8
     if dim == 1
@@ -199,15 +210,6 @@ end # @testset
 
 
 
-@testset "get_Groebner_basis" begin
-
-  @vars x, y
-  f = x^3 − 2*x*y 
-  g = x^2*y − 2*y^2 + x
-  bench = [-2*x*y + x^3, x + x^2*y - 2*y^2, -x^2, -2*x*y, x - 2*y^2]
-  @test get_Groebner_basis( [f, g], [x,y] ) == bench
-
-end # @testset
 
 
 

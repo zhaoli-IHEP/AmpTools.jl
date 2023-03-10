@@ -22,7 +22,8 @@ function get_monomial_weight(
 
   xpt_list = map( xi -> get_exponent(monomial,xi), xi_list )
   # graded lexicographic order
-  return vcat( [sum(xpt_list)], xpt_list )
+  #return vcat( [sum(xpt_list)], xpt_list )
+  return vcat( [zero(Basic)], xpt_list )
 
 end # function get_monomial_weight
 
@@ -239,6 +240,7 @@ function get_Groebner_basis(
       s = get_spoly( p, q, xi_list)
       s = reduce_Groebner_v2( s, Gp_list, xi_list )
       if !iszero(s)
+#@show p q s G_list
         push!( G_list, s )
       end # if
     end # for one_pair
@@ -252,4 +254,67 @@ function get_Groebner_basis(
   return G_list
 
 end # function get_Groebner_basis
+
+
+
+
+######################################
+# Interface to Groebner.jl
+function get_Groebner_basis_v2(
+    F_list::Vector{Basic}, 
+    xi_list::Vector{Basic} 
+)::Vector{Basic}
+######################################
+
+  xi_str_list = map( string, xi_list )
+  R, new_xi_list = PolynomialRing(QQ, xi_str_list);
+
+  polys = Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}()
+  for F in F_list 
+    term_list = get_add_vector_expand(F)
+    new_F = zero(R)
+    for one_term in term_list
+      the_coeff = convert( Int64, subs( one_term, Dict(xi_list .=> one(Basic)) ) )
+      xpt_list = get_monomial_weight( one_term, xi_list )[2:end]
+      new_F += the_coeff * prod( new_xi_list .^ xpt_list )
+    end # for one_term
+    push!( polys, new_F )
+  end # for F
+
+  G_list = groebner(polys)
+
+  new_G_list = Vector{Basic}()
+  for G in G_list
+    new_G = zero(Basic)
+    n_term = length(G)
+    for index in 1:n_term
+      the_coeff = AbstractAlgebra.coeff(G,index) 
+      one_term = term(G,index)
+      xpt_list = map( x->AbstractAlgebra.degree(one_term,x), new_xi_list )
+
+      new_term = the_coeff * prod( xi_list .^ xpt_list )
+      new_G += new_term
+    end # for index
+    push!( new_G_list, new_G )
+  end # for G
+
+  return new_G_list
+
+end # function get_Groebner_basis_v2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
