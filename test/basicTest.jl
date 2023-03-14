@@ -183,7 +183,8 @@ end # @testset
             SP(q2, k1)*SP(q2, k2)*SP(q1, q1), 
             SP(q2, k2)*SP(q1, k2)*SP(q1, q2) ], by=gen_sorted_str )
 
-  @test gen_SPcombo_v2( "q1q1q2q2", [k1,k2] ) == sort( [
+  # "q1q1q2q2"
+  @test gen_SPcombo_v2( [2,2,0], [k1,k2] ) == sort( [
           SP(q2, k1)^2*SP(q1, k2)*SP(q1, k1), 
                    SP(q2, k2)^2*SP(q1, k1)^2, 
           SP(q2, k2)^2*SP(q1, k2)*SP(q1, k1), 

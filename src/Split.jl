@@ -148,6 +148,24 @@ function convert_to_array( mom::Basic )::Array{NamedTuple{(:num, :ki),Tuple{Basi
 
 end # function convert_to_array
 
+##################################################
+function get_n_term_noexpand( expr::Basic )::Int64
+##################################################
+
+  return is_class(:Add,expr) ? (length∘get_args)(expr) : 1
+
+end # function get_n_term_noexpand
+
+##################################################
+function get_n_term_expand( expr::Basic )::Int64
+##################################################
+
+  expr_expand = expand(expr)
+  return is_class(:Add,expr_expand) ? (length∘get_args)(expr_expand) : 1
+
+end # function get_n_term_expand
+
+
 
 
 #####################################################

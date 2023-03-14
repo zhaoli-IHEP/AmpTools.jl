@@ -149,20 +149,21 @@ end # function generate_SPcombo
 
 #########################################
 function gen_SPcombo_v2(
-    rank_str::String,
+    rank_list::Vector{Int64},
     ind_mom_list::Array{Basic}
 )::Array{Basic}
 #########################################
 
-  # e.g. generate_SP("q1q1q2q2",[k1,k2,K3])
+  # e.g. gen_SPcombo_v2( [1,2,0],[k1,k2,K3])
   # only for three-loop level
 
   @vars q1,q2,q3
   @funs SP
 
-  ori_n_q1 = count( "q1", rank_str )
-  ori_n_q2 = count( "q2", rank_str )
-  ori_n_q3 = count( "q3", rank_str )
+  @assert length(rank_list) == 3
+  ori_n_q1 = rank_list[1] # count( "q1", rank_str )
+  ori_n_q2 = rank_list[2] # count( "q2", rank_str )
+  ori_n_q3 = rank_list[3] # count( "q3", rank_str )
 
   # term_q1ki = SP(q1,k1)+SP(q1,k2)+...
   term_q1ki = (sum∘map)( mom -> SP(q1,mom), ind_mom_list )
