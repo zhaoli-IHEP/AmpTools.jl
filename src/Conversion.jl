@@ -129,7 +129,7 @@ function to_Basic_dict(
 )::Dict{Basic,Basic}
 ################################
 
-  if isempty(dict)
+  if isempty(dict_list)
     return Dict{Basic,Basic}()
   end # if
 

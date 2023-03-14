@@ -91,9 +91,9 @@ end # function seq_replace
 
 
 ############################################
-@inline add_quote( str::Any )::String = "\"$str\""
+@inline add_quote( str::Union{Basic,String} )::String = "\"$str\""
 ############################################
-@inline add_quote( str_list::Vector{Any} )::Vector{String} = add_quote.(str_list)
+@inline add_quote( str_list::Union{Vector{Basic},Vector{String}} )::Vector{String} = add_quote.(str_list)
 ############################################
 
 
