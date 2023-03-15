@@ -166,11 +166,11 @@ function gen_SPcombo_v2(
   ori_n_q3 = rank_list[3] # count( "q3", rank_str )
 
   # term_q1ki = SP(q1,k1)+SP(q1,k2)+...
-  term_q1ki = (sum∘map)( mom -> SP(q1,mom), ind_mom_list )
+  term_q1ki = (sum∘map)( mom -> make_SP(q1,mom), ind_mom_list )
   # term_q2ki = SP(q2,k1)+SP(q2,k2)+...
-  term_q2ki = (sum∘map)( mom -> SP(q2,mom), ind_mom_list )
+  term_q2ki = (sum∘map)( mom -> make_SP(q2,mom), ind_mom_list )
   # term_q3ki = SP(q3,k1)+SP(q3,k2)+...
-  term_q3ki = (sum∘map)( mom -> SP(q3,mom), ind_mom_list )
+  term_q3ki = (sum∘map)( mom -> make_SP(q3,mom), ind_mom_list )
 
   #q1q2_xpt is the exponent of SP(q1,q2)
   #q2q3_xpt is the exponent of SP(q2,q3)
@@ -209,8 +209,8 @@ function gen_SPcombo_v2(
           q3ki_xpt = n_q3-2*q3q3_xpt
 
           total_term += term_q1ki^q1ki_xpt * term_q2ki^q2ki_xpt * term_q3ki^q3ki_xpt *
-                  SP(q1,q1)^q1q1_xpt * SP(q2,q2)^q2q2_xpt * SP(q3,q3)^q3q3_xpt *
-                  SP(q1,q2)^q1q2_xpt * SP(q1,q3)^q1q3_xpt * SP(q2,q3)^q2q3_xpt 
+                  make_SP(q1,q1)^q1q1_xpt * make_SP(q2,q2)^q2q2_xpt * make_SP(q3,q3)^q3q3_xpt *
+                  make_SP(q1,q2)^q1q2_xpt * make_SP(q1,q3)^q1q3_xpt * make_SP(q2,q3)^q2q3_xpt 
             
         end # for q1q1_xpt, q2q2_xpt, q3q3_xpt
         
