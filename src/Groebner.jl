@@ -21,8 +21,11 @@ function get_monomial_weight(
   @assert free_symbols(monomial) ⊆ xi_list
 
   xpt_list = map( xi -> get_exponent(monomial,xi), xi_list )
+
   # graded lexicographic order
   #return vcat( [sum(xpt_list)], xpt_list )
+  
+  # lexicographic order
   return vcat( [zero(Basic)], xpt_list )
 
 end # function get_monomial_weight
@@ -85,13 +88,13 @@ function get_LC(
   the_class = SymEngine.get_symengine_class(polynomial)
 
   if the_class != :Add
-    return polynomial_expand
+    return subs( polynomial_expand, Dict( xi_list .=> one(Basic) ) )
   end # if
 
   term_list = get_add_vector_noexpand(polynomial_expand)
   weight, pos = findmax( term -> get_monomial_weight(term,xi_list), term_list )
 
-  return subs( term_list[pos], xi_list .=> one(Basic) )
+  return subs( term_list[pos], Dict( xi_list .=> one(Basic) ) )
 
 end # function get_LC
 
@@ -120,97 +123,41 @@ end # function get_spoly
 
 
 
+
+
+
 ###########################################################
 # Define the function to reduce a polynomial with respect to a Gröbner basis
 function reduce_Groebner( 
-    f::Basic, 
+    poly::Basic, 
     G_list::Vector{Basic}, 
     xi_list::Vector{Basic} 
 )::Basic
 ###########################################################
 
-  r = copy(f)
-  for G in G_list
-
-    LT_g = get_LT( G, xi_list )
-    weight_LT_g = get_monomial_weight( LT_g, xi_list )
-    while true
-
-      LT_r = get_LT( r, xi_list )
-      weight_LT_r = get_monomial_weight( LT_r, xi_list )
-
-      if all( weight_LT_r .>= weight_LT_g ) 
-        r = expand( r - LT_r / LT_g * G )
-        if iszero(r)
-          return r
-        end # if
-      else
+  remainder = poly
+  while !iszero(remainder)
+    leading_term = get_LT(remainder,xi_list)
+    leading_term_weight = get_monomial_weight( leading_term, xi_list )
+    divided = false
+    for f in G_list
+      f_LT = get_LT(f,xi_list)
+      f_LT_weight = get_monomial_weight( f_LT, xi_list )
+      if all( f_LT_weight .<= leading_term_weight )
+        factor = leading_term/f_LT
+        remainder = expand( remainder - factor*f )
+        divided = true
         break
       end # if
-
-    end # while
-
-  end # for G
-
-  return r
-
-end # function reduce_Groebner
-
-
-
-
-
-###########################################################
-# Define the function to reduce a polynomial with respect to a Gröbner basis
-function reduce_Groebner_v2( 
-    f::Basic, 
-    G_list::Vector{Basic}, 
-    xi_list::Vector{Basic} 
-)::Basic
-###########################################################
-
-  r = copy(f)
-  while true
-    old_r = copy(r)
-
-    for G in G_list
-
-      LT_g = get_LT( G, xi_list )
-      weight_LT_g = get_monomial_weight( LT_g, xi_list )
-
-      while true
-
-        LT_r = get_LT( r, xi_list )
-        weight_LT_r = get_monomial_weight( LT_r, xi_list )
-  
-        if all( weight_LT_r .>= weight_LT_g ) 
-          r = expand( r - LT_r / LT_g * G )
-          if iszero(r)
-            return zero(Basic)
-          end # if
-        else
-          break
-        end # if
-
-      end # while
-
-    end # for G
-
-    if r == old_r 
+    end # for f
+    if !divided
       break
-    end # if
-
+    end	# if	
   end # while
 
-  return r
+  return remainder
 
-end # function reduce_Groebner_v2
-
-
-
-
-
-
+end # function reduce_Groebner
 
 
 
@@ -238,10 +185,22 @@ function get_Groebner_basis(
     Gp_list = copy(G_list)
     for (p,q) in (collect∘powerset)( Gp_list, 2, 2 )
       s = get_spoly( p, q, xi_list)
-      s = reduce_Groebner_v2( s, Gp_list, xi_list )
+      s = reduce_Groebner( s, Gp_list, xi_list )
       if !iszero(s)
-#@show p q s G_list
         push!( G_list, s )
+
+        G_list = setdiff( G_list, p )
+        p_rem = reduce_Groebner( p, G_list, xi_list )
+        if !iszero(p_rem)
+          push!( G_list, p_rem )
+        end # if
+
+        G_list = setdiff( G_list, q )
+        q_rem = reduce_Groebner( q, G_list, xi_list )
+        if !iszero(q_rem)
+          push!( G_list, q_rem )
+        end # if
+
       end # if
     end # for one_pair
 
@@ -251,6 +210,23 @@ function get_Groebner_basis(
     end # if
   end # while 
 
+  while true
+    Gp_list = map( x -> reduce_Groebner( x, setdiff(G_list,[x]), xi_list ), G_list )
+    Gp_list = filter( !iszero, Gp_list )
+    if length(G_list) == length(Gp_list) &&
+       (isempty∘setdiff)( G_list, Gp_list )
+      break
+    else
+      G_list = copy(Gp_list)
+    end # if
+  end # while
+
+  for index in 1:length(G_list)
+    G = G_list[index]
+    G_LC = get_LC( G, xi_list )
+    G_list[index] = expand(G/G_LC)
+  end # for G
+ 
   return G_list
 
 end # function get_Groebner_basis
@@ -281,7 +257,7 @@ function get_Groebner_basis_v2(
     push!( polys, new_F )
   end # for F
 
-  G_list = groebner(polys)
+  G_list = groebner(polys,ordering=:lex)
 
   new_G_list = Vector{Basic}()
   for G in G_list

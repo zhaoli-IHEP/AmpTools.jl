@@ -26,11 +26,23 @@ end # @testset
   @vars x, y
   f = x^3 − 2*x*y 
   g = x^2*y − 2*y^2 + x
-  bench = [y^3, x - 2*y^2]
-  gb = get_Groebner_basis_v2( [f, g], [x,y] ) 
-  @test gb == bench
+
+  #gb_bench = Basic[(-1/2)*x + y^2, x*y, x^2]
+  gb_bench = Basic[y^3, x - 2*y^2]
+  gb = get_Groebner_basis_v2( [f, g], [x,y] )
+  @test (isempty∘setdiff)( gb, gb_bench )
+
+  #gb_bench = Basic[x^2, x*y, (-1/2)*x + y^2]
+  gb_bench = Basic[y^3, x - 2*y^2]
+  gb = get_Groebner_basis( [f, g], [x,y] )
+  @test (isempty∘setdiff)( gb, gb_bench )
 
 end # @testset
+
+
+
+
+
 
 @testset "get_det_old" begin
   for dim ∈ 1:8
@@ -211,13 +223,5 @@ end # @testset
 
 
 
-
-
-
-
-
 @info "basicTest ends @ $(now())"
-
-
-
 
