@@ -1,4 +1,22 @@
 
+
+###########################
+function get_n_loop(
+  loop_den_list::Vector{Basic},
+)::Int64
+###########################
+
+  @assert all( x->is_FunctionSymbol(x)&&get_name(x)=="Den", loop_den_list )
+
+  mom_list = map( first∘get_args, loop_den_list )
+  n_loop = (length∘unique∘filter)( x->(first∘string)(x)=='q', free_symbols(mom_list) )
+  return n_loop
+
+end # function get_n_loop
+
+
+
+
 ###################################################
 """
     make_SP( mom1::Basic, mom2::Basic)::Basic

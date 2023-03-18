@@ -30,9 +30,8 @@ export get_add_vector_noexpand, get_add_vector_expand, get_mul_vector
 export get_n_term_noexpand, get_n_term_expand
 export mul_by_term
 export convert_to_array
-export make_SP, make_FV, split_SP, recover_SP
-export get_exponent
-export get_degree
+export get_n_loop, make_SP, make_FV, split_SP, recover_SP
+export get_exponent, get_degree
 export split_coeff, drop_coeff, drop_coeff_keep_im
 export generate_SPcombo, gen_SPcombo_v2
 export iszero_numerical
