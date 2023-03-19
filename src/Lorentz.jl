@@ -15,6 +15,26 @@ function get_n_loop(
 end # function get_n_loop
 
 
+##################################
+function get_mom_conserv(
+    n_inc::Int64,
+    ext_mom_list::Vector{Basic}
+)::Pair{Basic,Basic}
+##################################
+
+  if iszero(n_inc)
+    # In the scalar integral, mom_conserv is supposed to have been implemented.
+    return zero(Basic) => zero(Basic)
+  end # if
+
+  # momentum conservation
+  Kn_expr = expand( 2*sum(ext_mom_list[1:n_inc])-sum(ext_mom_list)+ext_mom_list[end] )
+  mom_conserv = ext_mom_list[end] => Kn_expr
+  return mom_conserv
+
+end # function get_mom_conserv
+
+
 
 
 ###################################################
