@@ -24,7 +24,8 @@ function get_mom_conserv(
 
   if iszero(n_inc)
     # In the scalar integral, mom_conserv is supposed to have been implemented.
-    return zero(Basic) => zero(Basic)
+    @vars k1
+    return k1 => k1
   end # if
 
   # momentum conservation
