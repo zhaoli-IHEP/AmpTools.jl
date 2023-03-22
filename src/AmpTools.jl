@@ -27,9 +27,7 @@ export is_FunctionSymbol, is_number, is_class
 export to_String_dict, to_Basic_dict, to_Basic, to_String, subs_im
 export gen_sorted_str, gen_mma_str
 export get_add_vector_noexpand, get_add_vector_expand, get_mul_vector
-export get_n_term_noexpand, get_n_term_expand
-export mul_by_term
-export convert_to_array
+export get_n_term_noexpand, get_n_term_expand, mul_by_term
 export get_n_loop, get_mom_conserv, make_SP, make_FV, split_SP, recover_SP
 export get_exponent, get_degree
 export split_coeff, drop_coeff, drop_coeff_keep_im

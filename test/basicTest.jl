@@ -40,6 +40,27 @@ end # @testset
 end # @testset
 
 
+@testset "get_degree" begin
+  @vars x, y
+  poly = 1+2*x+y*3*x^3
+  @test AmpTools.get_degree( poly, x ) == 3
+end # @testset
+
+
+@testset "make_SP" begin
+  @funs SP
+  @vars k1, k2, k3, k4, q1, q2
+  @test AmpTools.make_SP(k1,k2) == SP(k1,k2)
+  @test AmpTools.make_SP(k1,-k2) == -SP(k1,k2)
+  @test AmpTools.make_SP(-k1,-k2) == SP(k1,k2)
+  @test AmpTools.make_SP(k1-k3,k2+k4) == SP(k1, k2) + SP(k1, k4) - SP(k2, k3) - SP(k3, k4)
+
+  @test AmpTools.make_SP( k1, k2 ) == SP(k1, k2)
+  @test AmpTools.make_SP( k1, k2+2*k3 ) == SP(k1, k2) + 2*SP(k1, k3)
+  test_mom = 2*k1+3*k2+k3+5*k4+6*q1+7*q2
+  @test AmpTools.make_SP( test_mom, test_mom ) == 4*SP(k1, k1) + 12*SP(k1, k2) + 4*SP(k1, k3) + 20*SP(k1, k4) + 24*SP(k1, q1) + 28*SP(k1, q2) + 9*SP(k2, k2) + 6*SP(k2, k3) + 30*SP(k2, k4) + 36*SP(k2, q1) + 42*SP(k2, q2) + SP(k3, k3) + 10*SP(k3, k4) + 12*SP(k3, q1) + 14*SP(k3, q2) + 25*SP(k4, k4) + 60*SP(k4, q1) + 70*SP(k4, q2) + 36*SP(q1, q1) + 84*SP(q1, q2) + 49*SP(q2, q2)
+end # @testset
+
 
 
 
@@ -136,27 +157,6 @@ end
   end
 end
 
-
-@testset "get_degree" begin
-  @vars x, y
-  poly = 1+2*x+y*3*x^3
-  @test AmpTools.get_degree( poly, x ) == 3
-end # @testset
-
-
-@testset "make_SP" begin
-  @funs SP
-  @vars k1, k2, k3, k4, q1, q2
-  @test AmpTools.make_SP(k1,k2) == SP(k1,k2)
-  @test AmpTools.make_SP(k1,-k2) == -SP(k1,k2)
-  @test AmpTools.make_SP(-k1,-k2) == SP(k1,k2)
-  @test AmpTools.make_SP(k1-k3,k2+k4) == SP(k1, k2) + SP(k1, k4) - SP(k2, k3) - SP(k3, k4)
-
-  @test AmpTools.make_SP( k1, k2 ) == SP(k1, k2)
-  @test AmpTools.make_SP( k1, k2+2*k3 ) == SP(k1, k2) + 2*SP(k1, k3)
-  test_mom = 2*k1+3*k2+k3+5*k4+6*q1+7*q2
-  @test AmpTools.make_SP( test_mom, test_mom ) == 4*SP(k1, k1) + 12*SP(k1, k2) + 4*SP(k1, k3) + 20*SP(k1, k4) + 24*SP(k1, q1) + 28*SP(k1, q2) + 9*SP(k2, k2) + 6*SP(k2, k3) + 30*SP(k2, k4) + 36*SP(k2, q1) + 42*SP(k2, q2) + SP(k3, k3) + 10*SP(k3, k4) + 12*SP(k3, q1) + 14*SP(k3, q2) + 25*SP(k4, k4) + 60*SP(k4, q1) + 70*SP(k4, q2) + 36*SP(q1, q1) + 84*SP(q1, q2) + 49*SP(q2, q2)
-end # @testset
 
 
 @testset "gen_sorted_str" begin

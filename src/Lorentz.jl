@@ -38,7 +38,7 @@ end # function get_mom_conserv
 
 
 
-###################################################
+######################
 """
     make_SP( mom1::Basic, mom2::Basic)::Basic
 
@@ -55,31 +55,48 @@ julia> FeAmGen.make_SP( 2*k1+3*k2+k3, k1+k2 )
 2*SP(k1, k1) + 2*SP(k1, k2) + 3*SP(k2, k1) + 3*SP(k2, k2) + SP(k3, k1) + SP(k3, k2)
 ```
 """
-function make_SP( mom1::Basic, mom2::Basic )::Basic
-###################################################
-
-  if iszero(mom1) || iszero(mom2)
-    return zero(Basic)
-  end # if
+function make_SP(
+    mom1::Basic, 
+    mom2::Basic 
+)::Basic 
+######################
 
   @funs SP
+  term_list = get_add_vector_expand(mom1*mom2)
+  result_sp = zero(Basic)
+  for one_term in term_list
+    var_list = sort( free_symbols(one_term), by=string )
+    @assert length(var_list) in [1,2]
+    dict = Dict( var_list .=> one(Basic) )
+    the_coeff = subs( one_term, dict )
+    the_sp = length(var_list) == 1 ? SP(var_list...,var_list...) : SP( var_list... )
+    result_sp += the_coeff*the_sp
+  end # for one_term
+  
+  return result_sp
 
-  mom1_array = convert_to_array( mom1 )
-  mom2_array = convert_to_array( mom2 )
+end # function make_SP 
 
-  result_SP = zero(Basic)
-  for pair1 in mom1_array, pair2 in mom2_array
-    result_SP += pair1[:num] * pair2[:num] * SP( sort( Basic[pair1[:ki],pair2[:ki]], by=string )... )
-  end # for pair1, pair2
 
-  return result_SP
-
-end # function make_SP
 
 ###########################################
 # Squared momentum 
 make_SP( mom::Basic ) = make_SP(mom,mom)
 ###########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -120,23 +137,34 @@ end # function make_FV
 
 
 #######################################
+# Split SP(k1,k2) => FV(k1)*FV(k2)
 function split_SP( expr::Basic )::Basic
 #######################################
 
   @funs FV
 
-  if SymEngine.get_symengine_class( expr ) == :Add
+  if is_class( :Add, expr )
+
     return (sum ∘ map)( split_SP, get_args(expr) )
-  elseif SymEngine.get_symengine_class( expr ) == :Mul
+
+  elseif is_class( :Mul, expr ) 
+
     return (prod ∘ map)( split_SP, get_args(expr) )
-  elseif SymEngine.get_symengine_class( expr ) == :Pow
-    arg_list = get_args(expr)
-    return split_SP( arg_list[1] )^( arg_list[2] )
-  elseif SymEngine.get_symengine_class( expr ) == :FunctionSymbol && get_name(expr) == "SP"
-    arg_list = get_args(expr)
-    return FV(arg_list[1])*FV(arg_list[2])
+
+  elseif is_class( :Pow, expr ) 
+
+    base, xpt = get_args(expr)
+    return split_SP(base)^xpt
+
+  elseif is_FunctionSymbol(expr) && get_name(expr) == "SP"
+
+    mom1, mom2 = get_args(expr)
+    return FV(mom1)*FV(mom2)
+
   else
+
     return expr
+
   end # if
 
   return expr
@@ -152,13 +180,13 @@ function recover_SP( expr::Basic )::Basic
 
   @funs FV, SP
 
-  if SymEngine.get_symengine_class( expr ) == :Add
+  if is_class( :Add, expr )
 
     return (sum ∘ map)( recover_SP, get_args(expr) )
 
-  elseif SymEngine.get_symengine_class( expr ) == :Mul
+  elseif is_class( :Mul, expr )
 
-    FV_list = filter( x_ -> get_name(x_) == "FV", function_symbols(expr) )
+    FV_list = filter( x -> get_name(x) == "FV", function_symbols(expr) )
     n_FV = length(FV_list)
     if n_FV == 0
       return expr
@@ -173,15 +201,15 @@ function recover_SP( expr::Basic )::Basic
       mom2 = first(get_args(FV2))
       return expr / (FV1*FV2) * make_SP(mom1,mom2)
     else
-      error( "# of FV is not excepted: "*string(expr) )
+      error( "# of FV is not excepted: $(expr)" )
     end # if
    
-  elseif SymEngine.get_symengine_class( expr ) == :Pow &&
-         SymEngine.get_symengine_class( get_args(expr)[1] ) == :FunctionSymbol &&
-         get_name( get_args(expr)[1] ) == "FV"
+  elseif is_class( :Pow, expr ) &&
+         is_FunctionSymbol( get_args(expr)[1] ) &&
+         (get_name∘first∘get_args)(expr) == "FV"
 
-    @assert get_args(expr)[2] == 2
-    mom = get_args(get_args(expr)[1])[1]
+    @assert (last∘get_args)(expr) == 2
+    mom = (first∘get_args∘first∘get_args)(expr)
     return make_SP( mom, mom )
 
   else
