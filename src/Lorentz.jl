@@ -61,6 +61,10 @@ function make_SP(
 )::Basic 
 ######################
 
+  if iszero(mom1) || iszero(mom2)
+    return zero(Basic)
+  end # if
+
   @funs SP
   term_list = get_add_vector_expand(mom1*mom2)
   result_sp = zero(Basic)
@@ -123,7 +127,7 @@ function make_FV( mom::Basic, rho::Basic )::Basic
   elseif mom_class == :Add
 
     arg_list = get_args(mom)
-    return sum( map( m_ -> make_FV(m_,rho), arg_list ) )
+    return sum( map( x -> make_FV(x,rho), arg_list ) )
 
   else
 
