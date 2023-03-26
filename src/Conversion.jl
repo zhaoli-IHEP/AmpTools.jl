@@ -154,7 +154,11 @@ end # function to_Basic_dict
 
 
 ##############################################################
+@inline to_Basic( str::SubString{String} )::Basic = (to_Basic∘string)(str)
+##############################################################
 @inline to_Basic( str_list::Vector{String} )::Vector{Basic} = map( to_Basic, str_list )
+##############################################
+@inline to_Basic( str_list::Vector{SubString{String}} )::Vector{Basic} = map( to_Basic∘string, str_list )
 ##############################################
 @inline to_String( ex_list::Vector{Basic} )::Vector{String} = map( string, ex_list )
 ##############################################
