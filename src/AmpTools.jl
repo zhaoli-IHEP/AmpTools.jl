@@ -20,6 +20,7 @@ include("Lorentz.jl")
 include("Exponent.jl")
 include("Groebner.jl")
 include("Combo.jl")
+include("Momentum.jl")
 
 export get_Groebner_basis, get_Groebner_basis_v2
 export box_message, seq_replace, add_quote, bk_mkdir
@@ -35,6 +36,10 @@ export generate_SPcombo, gen_SPcombo_v2
 export iszero_numerical
 export get_det, get_adj, get_dot
 export calc_sha256
+export is_sym_index_format, is_loop_mom, is_ext_mom
+export get_sym_index, get_loop_index, get_ext_index
+export coefficient_matrix
+export get_loop_momenta, get_ext_momenta
 
 
 ###################
