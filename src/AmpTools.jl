@@ -32,7 +32,7 @@ export get_n_term_noexpand, get_n_term_expand, mul_by_term
 export get_n_loop, get_mom_conserv, make_SP, make_FV, split_SP, recover_SP
 export get_exponent, get_degree
 export split_coeff, drop_coeff, drop_coeff_keep_im
-export generate_SPcombo, gen_SPcombo_v2
+export generate_SPcombo, gen_SPcombo_v2, gen_SPcombo_v3
 export iszero_numerical
 export get_det, get_adj, get_dot
 export calc_sha256
