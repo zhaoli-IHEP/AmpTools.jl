@@ -166,11 +166,11 @@ function gen_SPcombo_v2(
   ori_n_q3 = rank_list[3] # count( "q3", rank_str )
 
   # term_q1ki = SP(q1,k1)+SP(q1,k2)+...
-  term_q1ki = (sum∘map)( mom -> make_SP(q1,mom), ind_mom_list )
+  term_q1ki = sum( mom -> make_SP(q1,mom), ind_mom_list )
   # term_q2ki = SP(q2,k1)+SP(q2,k2)+...
-  term_q2ki = (sum∘map)( mom -> make_SP(q2,mom), ind_mom_list )
+  term_q2ki = sum( mom -> make_SP(q2,mom), ind_mom_list )
   # term_q3ki = SP(q3,k1)+SP(q3,k2)+...
-  term_q3ki = (sum∘map)( mom -> make_SP(q3,mom), ind_mom_list )
+  term_q3ki = sum( mom -> make_SP(q3,mom), ind_mom_list )
 
   #q1q2_xpt is the exponent of SP(q1,q2)
   #q2q3_xpt is the exponent of SP(q2,q3)
@@ -224,4 +224,75 @@ function gen_SPcombo_v2(
   return SP_list
 
 end # function gen_SPcombo_v2
+
+
+
+
+
+#########################################
+# Created by Quan-feng WU
+# Mar. 28, 2023
+function gen_SPcombo_v3(
+  rank_list::Vector{Int64},
+  ind_mom_list::Array{Basic}
+)::Array{Basic}
+#########################################
+  q_list = reduce(vcat,
+    [ Basic("q$ii") for _ ∈ 1:rank_list[ii] ]
+      for ii ∈ eachindex(rank_list)
+  ) # end reduce
+
+  SP_list = Basic[]
+
+  for num_single_q ∈ 0:length(q_list)
+    if isodd(length(q_list) - num_single_q)
+      continue
+    end # if
+
+    for single_q_list ∈ multiset_combinations( q_list, num_single_q )
+
+      pair_q_list = copy(q_list)
+      for single_q ∈ single_q_list
+        q_index = findfirst( isequal(single_q), pair_q_list )
+        @assert !isnothing(q_index)
+        deleteat!( pair_q_list, q_index )
+      end # for single_q
+
+      single_q_SP_list = Basic[]
+      for ind_mom_comb ∈ with_replacement_combinations(ind_mom_list, num_single_q)
+        for ind_mom_ord ∈ multiset_permutations(ind_mom_comb, num_single_q)
+          push!( single_q_SP_list, prod( make_SP.( ind_mom_ord, single_q_list ) ) )
+        end # for ind_mom_ord
+      end # for ind_mom_comb
+
+      pair_q_SP_list = Basic[]
+      if isempty(pair_q_list)
+        push!( pair_q_SP_list, one(Basic) )
+      else
+        pair_q_SP_list = Basic[]
+        for pair_q_partition ∈ partitions( pair_q_list, 2 )
+          if (length∘first)(pair_q_partition) * 2 != length(pair_q_list)
+            continue
+          end # if
+          left_pair_q, right_pair_q = pair_q_partition
+
+          for right_pair_q_ord ∈ multiset_permutations( right_pair_q, length(right_pair_q) )
+            push!( pair_q_SP_list, prod( make_SP.( left_pair_q, right_pair_q_ord ) ) )
+          end # for right_pair_q_ord
+        end # for pair_q_partition
+      end # if
+
+      unique!(single_q_SP_list)
+      unique!(pair_q_SP_list)
+      for single_q_SP ∈ single_q_SP_list, pair_q_SP ∈ pair_q_SP_list
+        push!( SP_list, single_q_SP * pair_q_SP )
+      end # for single_q_SP
+    end # for single_q_list
+  end # for num_single_q
+
+  unique!( SP_list )
+  sort!( SP_list; by=gen_sorted_str )
+
+  return SP_list
+end # function gen_SPcombo_v3
 
