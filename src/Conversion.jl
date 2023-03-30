@@ -162,6 +162,10 @@ end # function to_Basic_dict
 ##############################################
 @inline to_String( ex_list::Vector{Basic} )::Vector{String} = map( string, ex_list )
 ##############################################
+@inline to_String( int_list::Vector{Int64} )::Vector{String} = map( string, int_list )
+##############################################
+
+
 
 
 
