@@ -98,18 +98,19 @@ end # function seq_replace
 
 
 ###############################################
-# backup before mkdir
-function bk_mkdir( dir_name::String )::Nothing
+# backup before mkpath
+function bk_mkpath( dir_name::String )::Nothing
 ###############################################
   
-  if isdir( dir_name )
-    mv( dir_name, "$(dir_name)_$(now())" )
+  if ispath( dir_name )
+    mv( dir_name, "$(dir_name)_$(now())"; force=true )
   end # if
-  mkdir( dir_name )
+  mkpath( dir_name )
 
   return nothing
 
-end # function bk_mkdir
+end # function bk_mkpath
+bk_mkdir = bk_mkpath
 
 
 
