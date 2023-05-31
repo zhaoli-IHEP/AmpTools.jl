@@ -1,7 +1,7 @@
 name = "AmpTools"
 uuid = "052ca545-3a01-4253-8448-a7bfac913c46"
 authors = ["zhaoli-IHEP <zhaoli@ihep.ac.cn>"]
-version = "0.1.0"
+version = "1.0.0"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
