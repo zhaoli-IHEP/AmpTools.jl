@@ -1,12 +1,3 @@
-Functions for FeAmGen, SeRA and NumAMF
 
-
---------------------------------------------------
-Install this package
-
-```julia
-(@v1.8) pkg> add https://github.com/zhaoli-IHEP/AmpTools.jl.git
-```
-
---------------------------------------------------
+This package includes the functions to extend the SymEngine.jl and those algorithms to handle the calculation of Feynman amplitude.
 
