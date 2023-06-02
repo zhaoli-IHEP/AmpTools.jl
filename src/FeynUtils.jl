@@ -1,7 +1,7 @@
 __precompile__()
 
 
-module AmplitudeTools
+module FeynUtils
 
 using AbstractAlgebra
 using Combinatorics
@@ -48,7 +48,7 @@ function __init__()
   return nothing
 end # function __init__
 
-end # module AmplitudeTools
+end # module FeynUtils 
 
 
 

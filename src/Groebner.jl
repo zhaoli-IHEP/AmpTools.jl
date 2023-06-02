@@ -257,7 +257,7 @@ function get_Groebner_basis_v2(
     push!( polys, new_F )
   end # for F
 
-  G_list = groebner(polys,ordering=:lex)
+  G_list = groebner( polys, ordering=Lex() )
 
   new_G_list = Vector{Basic}()
   for G in G_list

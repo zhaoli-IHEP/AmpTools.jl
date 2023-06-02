@@ -1,5 +1,5 @@
 using  Test
-using  AmplitudeTools, SymEngine
+using  FeynUtils, SymEngine
 
 @testset "gen_SPcombo_v3" begin
   for q1_rank ∈ 0:3, q2_rank ∈ 0:2, q3_rank ∈ 0:3, num_k ∈ 1:3

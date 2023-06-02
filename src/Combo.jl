@@ -52,7 +52,7 @@ end # function split_coeff
 function drop_coeff( expr::Basic )::Basic
 #########################################
 
-  return SymEngine.get_symengine_class( expr ) == :Mul ?
+  return is_class( :Mul, expr ) ?
          (prod∘filter)( x_-> SymEngine.get_symengine_class(x_) ∉ [:Complex,:Integer,:Rational], get_args(expr) ) : expr
 
 end # function drop_coeff
@@ -63,7 +63,7 @@ end # function drop_coeff
 function drop_coeff_keep_im( expr::Basic )::Basic
 #########################################
 
-  if SymEngine.get_symengine_class( expr ) == :Mul
+  if is_class( :Mul, expr ) 
     remove_integer_list = filter( x_-> SymEngine.get_symengine_class(x_) ∉ [:Integer,:Rational], get_args(expr) )
     keep_im_list = map( x_-> SymEngine.get_symengine_class(x_) == :Complex ? im : x_, remove_integer_list )
     return prod(keep_im_list)
@@ -100,13 +100,13 @@ function generate_SPcombo(
   # term_q1_k = SP(q1,k1)+SP(q1,k2)+...
   term_q1_k = 0
   for i in 1:num_mom
-    term_q1_k += SP(q1,independent_mom_list[i])
+    term_q1_k += make_SP(q1,independent_mom_list[i])
   end # for
 
   # term_q2_k = SP(q2,k1)+SP(q2,k2)+...
   term_q2_k = 0
   for i in 1:num_mom
-    term_q2_k += SP(q2,independent_mom_list[i])
+    term_q2_k += make_SP(q2,independent_mom_list[i])
   end # for
 
 
@@ -131,7 +131,7 @@ function generate_SPcombo(
       for q2_q2_exp in 0:max_q2_q2_exp
         q2_k_exp = q2_remain - 2*q2_q2_exp
         total_term += term_q1_k^q1_k_exp*term_q2_k^q2_k_exp*
-                      SP(q1,q1)^q1_q1_exp*SP(q2,q2)^q2_q2_exp*SP(q1,q2)^q1_q2_exp
+                      make_SP(q1,q1)^q1_q1_exp*make_SP(q2,q2)^q2_q2_exp*make_SP(q1,q2)^q1_q2_exp
       end # for q2_q2_exp
     end # for q1_q1_exp
   end # for q1_q2_exp
@@ -237,6 +237,7 @@ function gen_SPcombo_v3(
   ind_mom_list::Array{Basic}
 )::Array{Basic}
 #########################################
+
   q_list = reduce(vcat,
     [ Basic("q$ii") for _ ∈ 1:rank_list[ii] ]
       for ii ∈ eachindex(rank_list)

@@ -1,4 +1,4 @@
-name = "AmplitudeTools"
+name = "FeynUtils"
 uuid = "052ca545-3a01-4253-8448-a7bfac913c46"
 authors = ["zhaoli-IHEP <zhaoli@ihep.ac.cn>", "Quan-feng WU <wuquanfeng@ihep.ac.cn>"]
 version = "1.0.0"
