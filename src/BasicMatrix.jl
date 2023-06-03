@@ -3,7 +3,9 @@
 
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
-function get_det_naive( MM::Matrix{Basic} )::Basic
+function get_det_naive( 
+    MM::Matrix{Basic} 
+)::Basic
 ############################################
 
   nr, nc = size(MM)
@@ -34,7 +36,9 @@ end # function get_det_naive
 
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
-function get_det( MM::Matrix{Basic} )::Basic
+function get_det( 
+    MM::Matrix{Basic} 
+)::Basic
 ############################################
 
   nr, nc = size(MM)
@@ -61,9 +65,11 @@ function get_det( MM::Matrix{Basic} )::Basic
 end # function get_det
 
 
-####################################################
-function get_adj_naive( MM::Matrix{Basic} )::Matrix{Basic}
-####################################################
+#################################
+function get_adj_naive( 
+    MM::Matrix{Basic} 
+)::Matrix{Basic}
+#################################
 
   nr, nc = size( MM )
   @assert nr == nc
@@ -142,9 +148,12 @@ end # function get_adj
 
 
 
-###############################################################
-function get_dot( m1::Matrix{Basic}, m2::Matrix{Basic} )::Basic
-###############################################################
+################################
+function get_dot( 
+    m1::Matrix{Basic}, 
+    m2::Matrix{Basic} 
+)::Basic
+################################
 
   nr1, nc1 = size(m1)
   nr2, nc2 = size(m2)
@@ -160,10 +169,10 @@ function get_dot( m1::Matrix{Basic}, m2::Matrix{Basic} )::Basic
     vec1 = collect( view( m1, :, 1 ) )
     vec2 = collect( view( m2, :, 1 ) )
   else
-    error( "nr, nc is not expected: "*string(nr)*", "*string(nc) )
+    error( "nr, nc is not expected: $(nr), $(nc)" )
   end # if
  
-  return sum( vec1.*vec2 )
+  return sum( vec1 .* vec2 )
 
 end # function get_dot
 
