@@ -169,58 +169,34 @@ end # @testset
 
 
 
-@testset "generate_SPcombo" begin
+@testset "gen_SPcombo" begin
   @vars q1,q2,q3,k1,k2,k3
   @funs SP
-  @test generate_SPcombo( "q1q1q2q2", [k1,k2] ) == sort( [ 
+  @test gen_SPcombo( [2,2,0], [k1,k2] ) == sort( [ 
           make_SP(q2, k1)^2*make_SP(q1, k2)*make_SP(q1, k1), 
-                   make_SP(q2, k2)^2*make_SP(q1, k1)^2, 
+          make_SP(q2, k2)^2*make_SP(q1, k1)^2, 
           make_SP(q2, k2)^2*make_SP(q1, k2)*make_SP(q1, k1), 
-                   make_SP(q2, k2)^2*make_SP(q1, k2)^2, 
+          make_SP(q2, k2)^2*make_SP(q1, k2)^2, 
           make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k2)^2, 
-            make_SP(q2, q2)*make_SP(q1, k2)*make_SP(q1, k1), 
+          make_SP(q2, q2)*make_SP(q1, k2)*make_SP(q1, k1), 
           make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k1)^2, 
-                     make_SP(q2, q2)*make_SP(q1, k1)^2, 
-                   make_SP(q2, k1)^2*make_SP(q1, k2)^2, 
-            make_SP(q2, k1)*make_SP(q1, k2)*make_SP(q1, q2), 
-                     make_SP(q2, k2)^2*make_SP(q1, q1), 
-                       make_SP(q2, q2)*make_SP(q1, q1), 
-                     make_SP(q2, k1)^2*make_SP(q1, q1), 
- make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, k1), 
-                     make_SP(q2, q2)*make_SP(q1, k2)^2, 
-                                make_SP(q1, q2)^2, 
-            make_SP(q2, k2)*make_SP(q1, k1)*make_SP(q1, q2), 
-            make_SP(q2, k1)*make_SP(q1, k1)*make_SP(q1, q2), 
-                   make_SP(q2, k1)^2*make_SP(q1, k1)^2, 
-            make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, q1), 
-            make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, q2) ], by=gen_sorted_str )
-
-  # "q1q1q2q2"
-  @test gen_SPcombo_v2( [2,2,0], [k1,k2] ) == sort( [
-          make_SP(q2, k1)^2*make_SP(q1, k2)*make_SP(q1, k1), 
-                   make_SP(q2, k2)^2*make_SP(q1, k1)^2, 
-          make_SP(q2, k2)^2*make_SP(q1, k2)*make_SP(q1, k1), 
-                   make_SP(q2, k2)^2*make_SP(q1, k2)^2, 
-          make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k2)^2, 
-            make_SP(q2, q2)*make_SP(q1, k2)*make_SP(q1, k1), 
-          make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k1)^2, 
-                     make_SP(q2, q2)*make_SP(q1, k1)^2, 
-                   make_SP(q2, k1)^2*make_SP(q1, k2)^2, 
-            make_SP(q2, k1)*make_SP(q1, k2)*make_SP(q1, q2), 
-                     make_SP(q2, k2)^2*make_SP(q1, q1), 
-                       make_SP(q2, q2)*make_SP(q1, q1), 
-                     make_SP(q2, k1)^2*make_SP(q1, q1), 
- make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, k1), 
-                     make_SP(q2, q2)*make_SP(q1, k2)^2, 
-                                make_SP(q1, q2)^2, 
-            make_SP(q2, k2)*make_SP(q1, k1)*make_SP(q1, q2), 
-            make_SP(q2, k1)*make_SP(q1, k1)*make_SP(q1, q2), 
-                   make_SP(q2, k1)^2*make_SP(q1, k1)^2, 
-            make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, q1), 
-            make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, q2) ], by=gen_sorted_str )
+          make_SP(q2, q2)*make_SP(q1, k1)^2, 
+          make_SP(q2, k1)^2*make_SP(q1, k2)^2, 
+          make_SP(q2, k1)*make_SP(q1, k2)*make_SP(q1, q2), 
+          make_SP(q2, k2)^2*make_SP(q1, q1), 
+          make_SP(q2, q2)*make_SP(q1, q1), 
+          make_SP(q2, k1)^2*make_SP(q1, q1), 
+          make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, k1), 
+          make_SP(q2, q2)*make_SP(q1, k2)^2, 
+          make_SP(q1, q2)^2, 
+          make_SP(q2, k2)*make_SP(q1, k1)*make_SP(q1, q2), 
+          make_SP(q2, k1)*make_SP(q1, k1)*make_SP(q1, q2), 
+          make_SP(q2, k1)^2*make_SP(q1, k1)^2, 
+          make_SP(q2, k1)*make_SP(q2, k2)*make_SP(q1, q1), 
+          make_SP(q2, k2)*make_SP(q1, k2)*make_SP(q1, q2) 
+        ], by=gen_sorted_str )
 
 end # @testset
-
 
 
 @info "basicTest ends @ $(now())"
