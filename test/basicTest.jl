@@ -65,7 +65,7 @@ end # @testset
 
 
 
-@testset "get_det_old" begin
+@testset "get_det_naive" begin
   for dim ∈ 1:8
     if dim == 1
       tmp_mat = Matrix{Basic}(undef, 1, 1)
@@ -74,7 +74,7 @@ end # @testset
       tmp_mat = reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
     end
 
-    diff_result = FeynUtils.get_det_old(tmp_mat)
+    diff_result = FeynUtils.get_det_naive(tmp_mat)
     for perm ∈ permutations(1:dim)
       σ = (iseven ∘ parity)(perm) ? 1 : -1
       diff_result -= σ * reduce(*, tmp_mat[ii, perm[ii]] for ii ∈ 1:dim)
@@ -84,7 +84,7 @@ end # @testset
 
   for dim ∈ 1:10
     tmp_mat = rand(Basic.(0:100), dim, dim)
-    @test det(tmp_mat) == FeynUtils.get_det_old(tmp_mat)
+    @test det(tmp_mat) == FeynUtils.get_det_naive(tmp_mat)
   end
 end
 
@@ -113,12 +113,12 @@ end
 end
 
 
-@testset "`get_det_old` vs. `get_det`" begin
+@testset "`get_det_naive` vs. `get_det`" begin
   for dim ∈ 1:10
     tmp_mat = rand(Basic.(-100:100), dim, dim)
     println("For $dim dimensional numeric matrix.")
-    println("Original `get_det_old`:")
-    @btime FeynUtils.get_det_old($tmp_mat)
+    println("Original `get_det_naive`:")
+    @btime FeynUtils.get_det_naive($tmp_mat)
     println("Bisection `get_det`:")
     @btime FeynUtils.get_det($tmp_mat)
     println()
@@ -133,8 +133,8 @@ end
       reduce(hcat, [Basic("x_$(ii)_$(jj)") for ii ∈ 1:dim] for jj ∈ 1:dim)
     end
     println("For $dim dimensional symbolic matrix.")
-    println("Original `get_det_old`:")
-    @btime FeynUtils.get_det_old($tmp_mat)
+    println("Original `get_det_naive`:")
+    @btime FeynUtils.get_det_naive($tmp_mat)
     println("Bisection `get_det`:")
     @btime FeynUtils.get_det($tmp_mat)
     println()

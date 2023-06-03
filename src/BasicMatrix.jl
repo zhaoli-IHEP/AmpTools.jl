@@ -3,7 +3,7 @@
 
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
-function get_det_old( MM::Matrix{Basic} )::Basic
+function get_det_naive( MM::Matrix{Basic} )::Basic
 ############################################
 
   nr, nc = size(MM)
@@ -24,12 +24,12 @@ function get_det_old( MM::Matrix{Basic} )::Basic
     element = MM[1,cc]
     cofactor = (-1)^(1+cc)
     sub_mat = MM[ 2:nr, setdiff(1:nc,cc) ]
-    detMM += element * cofactor * get_det_old(sub_mat)
+    detMM += element * cofactor * get_det_naive(sub_mat)
   end # for cc
 
   return detMM
 
-end # function get_det_old
+end # function get_det_naive
 
 
 ############################################
@@ -62,7 +62,7 @@ end # function get_det
 
 
 ####################################################
-function get_adj_old( MM::Matrix{Basic} )::Matrix{Basic}
+function get_adj_naive( MM::Matrix{Basic} )::Matrix{Basic}
 ####################################################
 
   nr, nc = size( MM )
@@ -98,7 +98,7 @@ function get_adj_old( MM::Matrix{Basic} )::Matrix{Basic}
 
   return adjMM
 
-end # function get_adj_old
+end # function get_adj_naive
 
 
 
