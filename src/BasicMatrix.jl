@@ -56,8 +56,12 @@ function get_det(
   sub_dim = (Int∘floor)(nr / 2)
   for selected_cols in combinations(1:nc, sub_dim)
     cofactor = (-1)^(sum(1:sub_dim) + sum(selected_cols))
-    det += get_det( MM[1:sub_dim, selected_cols] ) * cofactor *
-      get_det( MM[sub_dim+1:end, setdiff(1:nc, selected_cols)] )
+    fac1 = get_det( MM[1:sub_dim, selected_cols] )
+    if iszero(fac1)
+      continue
+    end # if
+    fac2 = get_det( MM[(sub_dim+1):end, setdiff(1:nc, selected_cols)] ) 
+    det += fac1 * cofactor * fac2
   end # for selected_cols
 
   return  det
@@ -178,8 +182,112 @@ end # function get_dot
 
 
 
+########################
+function rref(
+    A::Matrix{Basic}
+)::Matrix{Basic}
+########################
+
+  m, n = size(A)
+  lead = 1
+
+  for r in 1:m
+    if n < lead
+      return A
+    end
+
+    i = r
+    while (iszero∘expand)( A[i, lead] )
+      i += 1
+      if m < i
+        i = r
+        lead += 1
+        if n < lead
+          return A
+        end
+      end
+    end
+
+    if i != r
+      A[[i, r], :] = A[[r, i], :]
+    end
+
+    pivot = A[r, lead]
+    A[r, :] = A[r, :] / pivot
 
 
+    for i in 1:m
+      if i != r
+        factor = A[i, lead]
+        A[i, :] = A[i, :] - factor * A[r, :] 
+      ##A[i, :] = map( x->begin
+      ##  numer, denom = get_numer_denom_fermat(x)
+      ##  numer/denom
+      ##end, A[i, :] - factor * A[r, :] )
+      end
+    end
+
+    A = thread_rationalize_fermat(A)
+
+    lead += 1
+  end
+
+  return A
+
+end # function rref
+
+
+
+
+
+############################
+function calc_null_space(
+    mat::Matrix{Basic}
+)::Matrix{Basic}
+############################
+
+  mat = Matrix(mat)  # Convert input matrix to a numeric matrix
+  nr, nc = size(mat)
+  
+  if iszero(mat)
+    return one( Matrix{eltype(mat)}(undef, nc, nc) )
+  end
+  
+  rref_mat = rref(mat)
+
+  pivot_cols = Vector{Int64}()
+  for row in 1:nr
+    if all(iszero∘expand, rref_mat[row, :])
+      continue
+    end # if
+    for col in 1:nc
+      if !(iszero∘expand)(rref_mat[row, col])
+        push!(pivot_cols, col)
+        break
+      end # if
+    end # for col
+  end # for row
+    
+  null_cols = setdiff(collect(1:nc), pivot_cols)
+  
+  if length(null_cols) == 0
+    return Matrix{eltype(mat)}(undef, nc, 0)
+  end # if
+
+  ns_mat = zeros(eltype(mat), nc, length(null_cols))
+  for (i, null_col) in enumerate(null_cols)
+    ns_mat[null_col,i] = one(Basic)
+    for rref_rr in 1:length(pivot_cols)
+      pivot_col = pivot_cols[rref_rr]
+      ns_mat[pivot_col,i] = -rref_mat[rref_rr,null_col]
+    end # for pivot_col
+  end # for
+
+  @assert all( iszero∘expand, mat*ns_mat )
+
+  return ns_mat
+
+end # function calc_null_space
 
 
 
