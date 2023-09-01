@@ -41,7 +41,7 @@ export is_sym_index_format, is_loop_mom, is_ext_mom
 export get_sym_index, get_loop_index, get_ext_index
 export coefficient_matrix
 export get_loop_momenta, get_ext_momenta
-export get_rref_fermat
+export get_rref_fermat, rational_function_simplify
 
 
 ###################

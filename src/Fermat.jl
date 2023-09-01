@@ -84,3 +84,60 @@ function get_rref_fermat(
 
 end # function get_rref_fermat
 
+
+
+#############################################
+function rational_function_simplify( 
+    rat::Basic, 
+    surfix::String = "" 
+)::Basic
+#############################################
+
+  symbol_list = filter( x->x!="im", string.( free_symbols(rat) ) )
+  symbol_decl = join( [ "&(J=$(str));" for str in symbol_list ], "\n" )
+
+  fer_script_str = """
+  &(N=0);
+  &(t=0);
+  &(_t=0);
+  &(_d=100000);
+  &(M='');
+  &(_s=0);
+  
+  &(S='rational$(surfix).out');
+  
+  &(J=im);
+  $(symbol_decl)
+  &(P=im^2+1,1);
+  
+  expr:=$(rat);
+  
+  
+  &(U=1);
+  
+  !!(&o, expr);
+  
+  &(U=0);
+  
+  &q;
+  """
+
+  file = open( "rational$(surfix).fer", "w" )
+  write( file, fer_script_str )
+  close(file)
+
+  run( pipeline( `fermat`, stdin="rational$(surfix).fer", stdout="rational$(surfix).log" ) )
+
+  out_file = open( "rational$(surfix).out", "r" )
+  result_expr = Basic( read( out_file, String ) )
+  close( out_file )
+
+  result_expr = subs( result_expr, Basic("im")=>im )
+
+  rm( "rational$(surfix).fer" )
+  rm( "rational$(surfix).out" )
+  rm( "rational$(surfix).log" )
+
+  return result_expr
+
+end # function rational_function_simplify
