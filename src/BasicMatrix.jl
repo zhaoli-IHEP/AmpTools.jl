@@ -4,7 +4,8 @@
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
 function get_det_naive( 
-    MM::Matrix{Basic} 
+    MM::Matrix{Basic}, 
+    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0) 
 )::Basic
 ############################################
 
@@ -18,18 +19,36 @@ function get_det_naive(
   if nr == 2 
     return MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
   end # if
+
+  if isempty(shape_mat)
+    shape_mat = zeros( Int64, nr, nc )
+    for rr in 1:nr, cc in 1:nc
+      shape_mat[rr,cc] = iszero(MM[rr,cc]) ? zero(Int64) : one(Int64)
+    end # for rr, cc
+  end # if
   
   # larger than 2x2 uses the Laplace expansion
   detMM = zero(Basic)
 
+  row_count_list = map( rr -> sum(shape_mat[rr,1:nc]), 1:nr )
+  min_sum, chosen_rr = findmin(row_count_list)
+  if iszero(min_sum)
+    return zero(Basic)
+  end # if
+
   for cc in 1:nc
-    element = MM[1,cc]
-    cofactor = (-1)^(1+cc)
-    sub_mat = MM[ 2:nr, setdiff(1:nc,cc) ]
-    detMM += element * cofactor * get_det_naive(sub_mat)
+    element = MM[chosen_rr,cc]
+    if iszero(element)
+      continue
+    end # if
+    cofactor = (-1)^(chosen_rr+cc)
+    sub_mat = MM[ setdiff(1:nr,chosen_rr), setdiff(1:nc,cc) ]
+    sub_shape_mat = shape_mat[ setdiff(1:nr,chosen_rr), setdiff(1:nc,cc) ]
+    sub_det = get_det_naive(sub_mat,sub_shape_mat)
+    detMM += element * cofactor * sub_det
   end # for cc
 
-  return detMM
+  return expand(detMM)
 
 end # function get_det_naive
 
@@ -67,6 +86,40 @@ function get_det(
   return  det
 
 end # function get_det
+
+
+#############################
+function lu_decomposition(
+    A::Matrix{Basic} 
+)::Tuple{Matrix{Basic},Matrix{Basic}} 
+#############################
+
+  n = size(A, 1)
+  L = one( Matrix{Basic}(undef, n, n) )
+  U = deepcopy(A)
+    
+  for i in 1:n
+    for j in 1:i-1
+      sum = 0.0
+      for k in 1:j-1
+        sum += L[i, k] * U[k, j]
+      end # for k
+      U[i, j] -= sum
+    end # for j
+        
+    for j in i+1:n
+        sum = 0.0
+        for k in 1:i-1
+          sum += L[i, k] * U[k, j]
+        end # for k
+        L[i, j] = (A[i, j] - sum) / U[i, i]
+    end # for j
+  end # for i
+    
+  return L, U
+
+end # function lu_decomposition
+
 
 
 #################################
@@ -291,7 +344,28 @@ end # function calc_null_space
 
 
 
+#################################
+function get_matrix_shape_str(
+    mat::Matrix{Basic}
+)::String
+#################################
 
+  nr, nc = size(mat)
+  result_str = string()
+  for rr in 1:nr
+    for cc in 1:nc
+    ele = mat[rr,cc]
+      if iszero(ele)
+        result_str *= " "
+      else
+        result_str *= "⋅"
+      end # if
+    end # for cc
+    result_str *= "\n"
+  end # for rr
 
+  return result_str
+
+end # function get_matrix_shape_str
 
 
