@@ -2,74 +2,129 @@
 
 
 ############################################
-# Created by Quan-feng Wu, Feb 21, 2023
-function get_det_naive( 
-    MM::Matrix{Basic}, 
-    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0) 
+# Created by Quan-feng Wu, Sep. 5, 2023
+function get_det(
+    MM::Matrix{Basic},
+    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0)
+)::Basic
+  nr, nc = size(MM)
+  @assert nr == nc "The input matrix is not square! ($nr, $nc)"
+
+  nr == 1 && return MM[1, 1]
+  nr == 2 && return MM[1, 1] * MM[2, 2] - MM[1, 2] * MM[2, 1]
+
+  nr < 10 && return get_det_dense(MM; get_det_flag=true)
+
+  shape_mat = isempty(shape_mat) ?
+    [ iszero(MM[ii, jj]) ? zero(Int64) : one(Int64) for ii ∈ 1:nr, jj ∈ 1:nc ] :
+    shape_mat
+  @assert size(shape_mat) == (nr, nc) "Wrong shape_mat size! Got $(size(shape_mat)), expected ($(nr), $(nc))."
+
+  non_zero_ratio = sum(shape_mat) / (nr * nc)
+  if nr ≥ 10 && non_zero_ratio ≤ .85
+    return get_det_sparse(MM, shape_mat; get_det_flag=true)
+  end # if
+
+  return get_det_dense(MM; get_det_flag=true)
+end
+############################################
+
+
+
+############################################
+# Created by Zhao Li, Sep. 4, 2023
+# Modified by Quan-feng WU, Sep. 5, 2023
+function get_det_sparse( 
+    MM::Matrix{Basic},
+    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0);
+    get_det_flag::Bool=false
 )::Basic
 ############################################
 
   nr, nc = size(MM)
-  @assert nr == nc
 
-  if nr == 1
-    return MM[1,1]
-  end # if
+  if !get_det_flag
+    @assert nr == nc
 
-  if nr == 2 
-    return MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
-  end # if
+    if nr == 1
+      return MM[1,1]
+    end # if
 
-  if isempty(shape_mat)
-    shape_mat = zeros( Int64, nr, nc )
-    for rr in 1:nr, cc in 1:nc
-      shape_mat[rr,cc] = iszero(MM[rr,cc]) ? zero(Int64) : one(Int64)
-    end # for rr, cc
+    if nr == 2 
+      return MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
+    end # if
+
+    if isempty(shape_mat)
+      shape_mat = zeros( Int64, nr, nc )
+      for rr in 1:nr, cc in 1:nc
+        shape_mat[rr,cc] = iszero(MM[rr,cc]) ? zero(Int64) : one(Int64)
+      end # for rr, cc
+    end # if
   end # if
   
   # larger than 2x2 uses the Laplace expansion
   detMM = zero(Basic)
 
-  row_count_list = map( rr -> sum(shape_mat[rr,1:nc]), 1:nr )
-  min_sum, chosen_rr = findmin(row_count_list)
-  if iszero(min_sum)
-    return zero(Basic)
-  end # if
+  # row_count_list = map( rr -> sum(shape_mat[rr,1:nc]), 1:nr )
+  # min_sum, chosen_rr = findmin(row_count_list)
+  min_col_sum, min_col_ind = (findmin∘vec∘sum)( shape_mat, dims=1 )
+  min_row_sum, min_row_ind = (findmin∘vec∘sum)( shape_mat, dims=2 )
+  iszero(min_col_sum) && return zero( Basic )
+  iszero(min_row_sum) && return zero( Basic )
 
-  for cc in 1:nc
-    element = MM[chosen_rr,cc]
-    if iszero(element)
-      continue
-    end # if
-    cofactor = (-1)^(chosen_rr+cc)
-    sub_mat = MM[ setdiff(1:nr,chosen_rr), setdiff(1:nc,cc) ]
-    sub_shape_mat = shape_mat[ setdiff(1:nr,chosen_rr), setdiff(1:nc,cc) ]
-    sub_det = get_det_naive(sub_mat,sub_shape_mat)
-    detMM += element * cofactor * sub_det
-  end # for cc
+  if min_col_val < min_row_val
+    non_zero_row_indices = findall( !iszero, shape_mat[:, min_col_ind] )
+    remaining_cols = setdiff( 1:nc, min_col_ind )
+    for row ∈ non_zero_row_indices
+      element = MM[ row, min_col_ind ]
+      cofactor = (-1)^(row + min_col_ind)
+      remaining_rows = setdiff( 1:nr, row )
+      sub_mat = MM[ remaining_rows, remaining_cols ]
+      sub_shape_mat = shape_mat[ remaining_rows, remaining_cols ]
+      detMM += element * cofactor * get_det( sub_mat, sub_shape_mat )
+    end
+
+    return expand(detMM)
+  end
+
+  non_zero_col_indices = findall( !iszero, shape_mat[min_row_ind, :] )
+  remaining_rows = setdiff( 1:nr, min_row_ind )
+  for col ∈ non_zero_col_indices
+    element = MM[ min_row_ind, col ]
+    cofactor = (-1)^(min_row_ind + col)
+    remaining_cols = setdiff( 1:nc, col )
+    sub_mat = MM[ remaining_rows, remaining_cols ]
+    sub_shape_mat = shape_mat[ remaining_rows, remaining_cols ]
+    detMM += element * cofactor * get_det( sub_mat, sub_shape_mat )
+  end
 
   return expand(detMM)
 
-end # function get_det_naive
+end # function get_det_sparse
+
 
 
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
-function get_det( 
-    MM::Matrix{Basic} 
+function get_det_dense( 
+    MM::Matrix{Basic};
+    get_det_flag::Bool=false
 )::Basic
 ############################################
 
   nr, nc = size(MM)
-  @assert nr == nc
 
-  if nr == 1
-    return MM[1, 1]
-  end
+  if !get_det_flag
+    @assert nr == nc
 
-  if nr == 2
-    return MM[1, 1] * MM[2, 2] - MM[1, 2] * MM[2, 1]
-  end
+    if nr == 1
+      return MM[1, 1]
+    end
+
+    if nr == 2
+      return MM[1, 1] * MM[2, 2] - MM[1, 2] * MM[2, 1]
+    end
+  end # if
 
   det = 0
   sub_dim = (Int∘floor)(nr / 2)
@@ -85,7 +140,7 @@ function get_det(
 
   return  det
 
-end # function get_det
+end # function get_det_dense
 
 
 #############################
