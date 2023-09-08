@@ -129,15 +129,39 @@ function rational_function_simplify(
   run( pipeline( `fermat`, stdin="rational$(surfix).fer", stdout="rational$(surfix).log" ) )
 
   out_file = open( "rational$(surfix).out", "r" )
-  result_expr = Basic( read( out_file, String ) )
+  result_expr = (to_Basic∘read)( out_file, String ) 
   close( out_file )
-
-  result_expr = subs( result_expr, Basic("im")=>im )
 
   rm( "rational$(surfix).fer" )
   rm( "rational$(surfix).out" )
   rm( "rational$(surfix).log" )
 
   return result_expr
+
+end # function rational_function_simplify
+
+
+
+#############################################
+function rational_function_simplify( 
+    mat::Matrix{Basic}, 
+    surfix::String = "" 
+)::Matrix{Basic}
+#############################################
+
+  cart = CartesianIndices(mat)
+  result_mat = zero(mat)
+  Threads.@threads for index in 1:length(cart)
+    printstyled( ".", color=:light_yellow )
+    rr = cart[index][1]
+    cc = cart[index][2]
+    if !iszero(mat[rr,cc])
+      result_mat[rr,cc] = rational_function_simplify( mat[rr,cc], "r$(rr)c$(cc)" )
+    end # if
+    printstyled( ".", color=:light_green )
+  end # for index
+  println()
+
+  return result_mat
 
 end # function rational_function_simplify
