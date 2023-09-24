@@ -24,7 +24,7 @@ include("Momentum.jl")
 include("Fermat.jl")
 
 export get_Groebner_basis, get_Groebner_basis_v2
-export box_message, seq_replace, add_quote, bk_mkdir
+export box_message, seq_replace, add_quote, bk_mkdir, fresh_mkdir
 export is_FunctionSymbol, is_number, is_class
 export to_String_dict, to_Basic_dict, to_Basic, to_String, subs_im
 export gen_sorted_str, gen_mma_str
@@ -42,7 +42,8 @@ export is_sym_index_format, is_loop_mom, is_ext_mom
 export get_sym_index, get_loop_index, get_ext_index
 export coefficient_matrix
 export get_loop_momenta, get_ext_momenta
-export get_rref_fermat, rational_function_simplify
+export get_rref_fermat, rational_function_simplify, numer_denom_fermat
+export findmatched
 
 
 ###################

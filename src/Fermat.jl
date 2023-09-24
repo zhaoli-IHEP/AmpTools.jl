@@ -13,14 +13,25 @@ function get_rref_fermat(
     return mat
   end # if
 
-  symbol_list = filter( s_->s_!="im", string.(free_symbols(mat)) )
-  symbol_decl = join( [ "&(J=$(str));" for str in symbol_list ], "\n" )
+  symbol_str_list = map( string, free_symbols(mat) )
+  symbol_str_list = filter( x->x!="im", symbol_str_list )
+  capital_symbol_list = (to_Basic∘filter)( x->x!=lowercase(x), symbol_str_list )
+  lowered_symbol_list = (to_Basic∘map)( lowercase∘string, capital_symbol_list )
+
+  symbol_decl = join( [ "&(J=$(x));" for x in map(lowercase,symbol_str_list) ], "\n" )
+
+  lower_dict = Dict{Basic,Basic}( capital_symbol_list .=> lowered_symbol_list )
+  recover_dict = Dict{Basic,Basic}( lowered_symbol_list .=> capital_symbol_list )
 
   nr, nc = size(mat)
 
   init_str = string()
   for rr in 1:nr, cc in 1:nc
-    init_str *= "mat[$rr,$cc]:=$(mat[rr,cc]);\n"
+    ele = mat[rr,cc]
+    if !iszero(ele) && !isempty(lower_dict)
+      ele = subs( ele, lower_dict )
+    end # if
+    init_str *= "mat[$rr,$cc]:=$(ele);\n"
   end # for rr, cc
 
   # The reshape in julia is col-wise
@@ -74,6 +85,9 @@ function get_rref_fermat(
   str_list = split( replace( result_str, "\n"=>"" ), "," )
   @assert length(str_list) == nr*nc
   ele_list = map( to_Basic, str_list )
+  if !isempty(recover_dict)
+    ele_list = map( x -> subs( x, recover_dict ), ele_list )
+  end # if
   rref_mat = reshape( ele_list, nr, nc )
 
   rm( "$(name_str).fer" )
@@ -93,8 +107,18 @@ function rational_function_simplify(
 )::Basic
 #############################################
 
-  symbol_list = filter( x->x!="im", string.( free_symbols(rat) ) )
-  symbol_decl = join( [ "&(J=$(str));" for str in symbol_list ], "\n" )
+  symbol_str_list = map( string, free_symbols(rat) )
+  symbol_str_list = filter( x->x!="im", symbol_str_list )
+  capital_symbol_list = (to_Basic∘filter)( x->x!=lowercase(x), symbol_str_list )
+  lowered_symbol_list = (to_Basic∘map)( lowercase∘string, capital_symbol_list )
+
+  symbol_decl = join( [ "&(J=$(x));" for x in map(lowercase,symbol_str_list) ], "\n" )
+
+  lower_dict = Dict{Basic,Basic}( capital_symbol_list .=> lowered_symbol_list )
+  recover_dict = Dict{Basic,Basic}( lowered_symbol_list .=> capital_symbol_list )
+  if !isempty(lower_dict)
+    rat = subs( rat, lower_dict )
+  end # if
 
   fer_script_str = """
   &(N=0);
@@ -132,6 +156,10 @@ function rational_function_simplify(
   result_expr = (to_Basic∘read)( out_file, String ) 
   close( out_file )
 
+  if !isempty(recover_dict)
+    result_expr = subs( result_expr, recover_dict )
+  end # if
+
   rm( "rational$(surfix).fer" )
   rm( "rational$(surfix).out" )
   rm( "rational$(surfix).log" )
@@ -165,3 +193,96 @@ function rational_function_simplify(
   return result_mat
 
 end # function rational_function_simplify
+
+
+
+
+
+
+
+
+
+#############################################
+function numer_denom_fermat( 
+    rat::Basic, 
+    surfix::String = "" 
+)::Tuple{Basic,Basic}
+#############################################
+
+  symbol_str_list = map( string, free_symbols(rat) )
+  symbol_str_list = filter( x->x!="im", symbol_str_list )
+  capital_symbol_list = (to_Basic∘filter)( x->x!=lowercase(x), symbol_str_list )
+  lowered_symbol_list = (to_Basic∘map)( lowercase∘string, capital_symbol_list )
+
+  symbol_decl = join( [ "&(J=$(x));" for x in map(lowercase,symbol_str_list) ], "\n" )
+
+  lower_dict = Dict{Basic,Basic}( capital_symbol_list .=> lowered_symbol_list )
+  recover_dict = Dict{Basic,Basic}( lowered_symbol_list .=> capital_symbol_list )
+  if !isempty(lower_dict)
+    rat = subs( rat, lower_dict )
+  end # if
+
+  fer_script_str = """
+  &(N=0);
+  &(t=0);
+  &(_t=0);
+  &(_d=100000);
+  &(M='');
+  &(_s=0);
+  
+  &(S='numerdenom$(surfix).out');
+  
+  &(J=im);
+  $(symbol_decl)
+  &(P=im^2+1,1);
+  
+  expr:=$(rat);
+  
+  &(U=1);
+  
+  !!(&o, Numer(expr));
+  !!(&o, ',');
+  !!(&o, Denom(expr));
+  
+  &(U=0);
+  
+  &q;
+  """
+
+  file = open( "numerdenom$(surfix).fer", "w" )
+  write( file, fer_script_str )
+  close(file)
+
+  run( pipeline( `fermat`, stdin="numerdenom$(surfix).fer", stdout="numerdenom$(surfix).log" ) )
+
+  out_file = open( "numerdenom$(surfix).out", "r" )
+  result_str = read( out_file, String ) 
+  close( out_file )
+
+  str_list = split( result_str, "," )
+  @assert length(str_list) == 2
+  numer = (to_Basic∘string)(str_list[1]) 
+  denom = (to_Basic∘string)(str_list[2]) 
+
+  if !isempty(recover_dict)
+    numer = subs( numer, recover_dict )
+    denom = subs( denom, recover_dict )
+  end # if
+
+  rm( "numerdenom$(surfix).fer" )
+  rm( "numerdenom$(surfix).out" )
+  rm( "numerdenom$(surfix).log" )
+
+  return numer, denom
+
+end # function numer_denom_fermat 
+
+
+
+
+
+
+
+
+
+

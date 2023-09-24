@@ -112,6 +112,19 @@ function bk_mkdir( dir_name::String )::Nothing
 end # function bk_mkdir
 
 
+###############################################
+# delete before mkdir
+function fresh_mkdir( dir_name::String )::Nothing
+###############################################
+  
+  if isdir( dir_name )
+    rm( dir_name, recursive=true )
+  end # if
+  mkdir( dir_name )
+
+  return nothing
+
+end # function fresh_mkdir
 
 ########################
 function calc_sha256( 

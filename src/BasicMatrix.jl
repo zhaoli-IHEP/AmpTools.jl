@@ -21,7 +21,7 @@ function get_det(
   end # if
 
   if nr < 10 
-    return get_det_dense( MM, get_det_flag=true )
+    return get_det_dense( MM )
   end # if
 
   if isempty(shape_mat) 
@@ -32,11 +32,12 @@ function get_det(
   """
 
   non_zero_ratio = sum(shape_mat) / (nr * nc)
+  # This is a heuristic condition to choose get_det_sparse or get_det_dense.
   if nr >= 10 && non_zero_ratio <= .85
-    return get_det_sparse( MM, shape_mat, get_det_flag=true )
+    return get_det_sparse( MM, shape_mat )
   end # if
 
-  return get_det_dense( MM, get_det_flag=true )
+  return get_det_dense( MM )
 
 end # function get_det
 
@@ -47,30 +48,27 @@ end # function get_det
 # Modified by Quan-feng WU, Sep. 5, 2023
 function get_det_sparse( 
     MM::Matrix{Basic},
-    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0);
-    get_det_flag::Bool=false
+    shape_mat::Matrix{Int64} = Matrix{Int64}(undef,0,0) 
 )::Basic
 ############################################
 
   nr, nc = size(MM)
 
-  if !get_det_flag
-    @assert nr == nc
+  @assert nr == nc
 
-    if nr == 1
-      return MM[1,1]
-    end # if
+  if nr == 1
+    return MM[1,1]
+  end # if
 
-    if nr == 2 
-      return MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
-    end # if
+  if nr == 2 
+    return MM[1,1]*MM[2,2] - MM[1,2]*MM[2,1]
+  end # if
 
-    if isempty(shape_mat)
-      shape_mat = zeros( Int64, nr, nc )
-      for rr in 1:nr, cc in 1:nc
-        shape_mat[rr,cc] = iszero(MM[rr,cc]) ? zero(Int64) : one(Int64)
-      end # for rr, cc
-    end # if
+  if isempty(shape_mat)
+    shape_mat = zeros( Int64, nr, nc )
+    for rr in 1:nr, cc in 1:nc
+      shape_mat[rr,cc] = iszero(MM[rr,cc]) ? zero(Int64) : one(Int64)
+    end # for rr, cc
   end # if
   
   # larger than 2x2 uses the Laplace expansion
@@ -97,10 +95,11 @@ function get_det_sparse(
       sub_mat = MM[ remaining_rows, remaining_cols ]
       sub_shape_mat = shape_mat[ remaining_rows, remaining_cols ]
       sub_det = get_det( sub_mat, sub_shape_mat )
+      #sub_det = get_det_sparse( sub_mat, sub_shape_mat )
       detMM += element * cofactor * sub_det 
     end # for row
 
-    return expand(detMM)
+    return detMM
 
   end # if
 
@@ -116,10 +115,11 @@ function get_det_sparse(
     sub_mat = MM[ remaining_rows, remaining_cols ]
     sub_shape_mat = shape_mat[ remaining_rows, remaining_cols ]
     sub_det = get_det( sub_mat, sub_shape_mat )
+    #sub_det = get_det_sparse( sub_mat, sub_shape_mat )
     detMM += element * cofactor * sub_det 
   end # for col
 
-  return expand(detMM)
+  return detMM
 
 end # function get_det_sparse
 
@@ -128,23 +128,20 @@ end # function get_det_sparse
 ############################################
 # Created by Quan-feng Wu, Feb 21, 2023
 function get_det_dense( 
-    MM::Matrix{Basic};
-    get_det_flag::Bool=false
+    MM::Matrix{Basic}
 )::Basic
 ############################################
 
   nr, nc = size(MM)
 
-  if !get_det_flag
-    @assert nr == nc
+  @assert nr == nc
 
-    if nr == 1
-      return MM[1,1]
-    end # if
+  if nr == 1
+    return MM[1,1]
+  end # if
 
-    if nr == 2
-      return MM[1,1]*MM[2,2]-MM[1,2]*MM[2,1]
-    end # if
+  if nr == 2
+    return MM[1,1]*MM[2,2]-MM[1,2]*MM[2,1]
   end # if
 
   result_det = 0

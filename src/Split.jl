@@ -74,3 +74,50 @@ end # function mul_by_term
 
 
 
+
+
+#########################
+function findmatched(
+    str::Union{ String, SubString{String} }, 
+    start_pos::Int64
+)::Int64
+#########################
+
+  left = str[start_pos]
+  if left == '('
+    right = ')' 
+    rx = r"[()]"
+  elseif left == '['
+    right = ']' 
+    rx = r"[\[\]]"
+  elseif left == '{'
+    right = '}' 
+    rx = r"[{}]"
+  else
+    error("Exception")
+  end # if
+
+  pos = (first∘findnext)( rx, str, start_pos )
+  lr = str[pos]
+  
+  count = 1
+  while true
+    pos = (first∘findnext)( rx, str, pos+1 )
+    lr = str[pos]
+
+    if lr == left
+      count += 1
+    elseif lr == right
+      count -= 1
+    else
+      error("Exception")
+    end # if
+
+    if iszero(count)
+      return pos
+    end # if
+  end # while
+
+end # function findmatched
+
+
