@@ -144,6 +144,20 @@ function get_loop_momenta( mom_list::Vector{Basic} )::Vector{Basic}
   return q_list
 end
 
+#################################
+function get_loop_momenta( 
+    mom::Basic 
+)::Vector{Basic}
+#################################
+
+  single_mom_list = free_symbols(mom)
+  q_list = filter( is_loop_mom, single_mom_list )
+  sort!(q_list; by=get_loop_index)
+
+  return q_list
+
+end # function get_loop_momenta
+
 
 
 ###################################################
