@@ -152,6 +152,23 @@ function to_Basic_dict(
 end # function to_Basic_dict
 
 
+##########################
+# This is prepared for the empty case in YAML file.
+function to_Basic_dict(
+    dict::Vector{Any} 
+)::Dict{Basic,Basic} 
+##########################
+
+  @assert isempty(dict)
+
+  if isempty(dict)
+    return Dict{Basic,Basic}()
+  end # if
+
+end # function to_Basic_dict
+
+
+
 
 ##############################################################
 @inline to_Basic( str::SubString{String} )::Basic = (to_Basic∘string)(str)
@@ -165,7 +182,17 @@ end # function to_Basic_dict
 @inline to_String( int_list::Vector{Int64} )::Vector{String} = map( string, int_list )
 ##############################################
 
+#####################
+# This is used for the empty list while reading YAML file.
+function to_Basic( 
+    list::Vector{Any}
+)::Vector{Basic}
+#####################
 
+  @assert isempty(list)
+  return Vector{Basic}() 
+
+end # function to_Basic
 
 
 

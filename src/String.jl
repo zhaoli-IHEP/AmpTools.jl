@@ -1,9 +1,3 @@
-#############################################################
-#
-# Although they do not have relation with SymEngine,
-#   the following functions have been widely used in our projects.
-#
-#############################################################
 
 
 #####################################################################
@@ -12,7 +6,10 @@
 
 Return nothing.
 """
-function box_message( message::String; color=:light_cyan )::Nothing
+function box_message( 
+    message::String; 
+    color=:light_cyan 
+)::Nothing
 #####################################################################
 
   line_list = filter( !isempty, split( message, "\n" ) )
