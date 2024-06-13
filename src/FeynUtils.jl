@@ -12,6 +12,7 @@ using SymEngine
 
 
 include("BasicMatrix.jl")
+include("BTF.jl")
 include("Type.jl")
 include("Conversion.jl")
 include("String.jl")
@@ -44,6 +45,7 @@ export coefficient_matrix
 export get_loop_momenta, get_ext_momenta
 export get_rref_fermat, rational_function_simplify, numer_denom_fermat
 export findmatched
+export generate_BTF_matrix, BTF_inverse
 
 
 ###################

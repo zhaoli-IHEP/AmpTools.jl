@@ -173,22 +173,30 @@ end # function rational_function_simplify
 #############################################
 function rational_function_simplify( 
     mat::Matrix{Basic}, 
-    surfix::String = "" 
+    surfix::String = "";
+    verbose = true
 )::Matrix{Basic}
 #############################################
 
   cart = CartesianIndices(mat)
   result_mat = zero(mat)
   Threads.@threads for index in 1:length(cart)
-    printstyled( ".", color=:light_yellow )
+    if verbose == true
+      printstyled( ".", color=:light_yellow )
+    end # if
     rr = cart[index][1]
     cc = cart[index][2]
     if !iszero(mat[rr,cc])
       result_mat[rr,cc] = rational_function_simplify( mat[rr,cc], "r$(rr)c$(cc)" )
     end # if
-    printstyled( ".", color=:light_green )
+    if verbose == true
+      printstyled( ".", color=:light_green )
+    end # if
   end # for index
-  println()
+
+  if verbose == true
+    println()
+  end # if
 
   return result_mat
 
