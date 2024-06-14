@@ -173,30 +173,22 @@ end # function rational_function_simplify
 #############################################
 function rational_function_simplify( 
     mat::Matrix{Basic}, 
-    surfix::String = "";
-    verbose = true
+    surfix::String = ""
 )::Matrix{Basic}
 #############################################
 
   cart = CartesianIndices(mat)
   result_mat = zero(mat)
+  p = Progress(length(cart); desc="Simplify...")
   Threads.@threads for index in 1:length(cart)
-    if verbose == true
-      printstyled( ".", color=:light_yellow )
-    end # if
     rr = cart[index][1]
     cc = cart[index][2]
     if !iszero(mat[rr,cc])
       result_mat[rr,cc] = rational_function_simplify( mat[rr,cc], "r$(rr)c$(cc)" )
     end # if
-    if verbose == true
-      printstyled( ".", color=:light_green )
-    end # if
+    next!(p)
   end # for index
-
-  if verbose == true
-    println()
-  end # if
+  finish!(p)
 
   return result_mat
 
@@ -289,6 +281,31 @@ end # function numer_denom_fermat
 
 
 
+#############################################
+function numer_denom_simplify( 
+    mat::Matrix{Basic}, 
+    surfix::String = ""
+)::Tuple{Matrix{Basic},Matrix{Basic}}
+#############################################
+
+  cart = CartesianIndices(mat)
+  num_mat = zeros(Basic,size(mat))
+  den_mat = ones(Basic,size(mat))
+
+  p = Progress(length(cart); desc="Simplify...")
+  Threads.@threads for index in 1:length(cart)
+    rr = cart[index][1]
+    cc = cart[index][2]
+    if !iszero(mat[rr,cc])
+      num_mat[rr,cc], den_mat[rr,cc] = numer_denom_fermat( mat[rr,cc], "r$(rr)c$(cc)" )
+    end # if
+    next!(p)
+  end # for index
+  finish!(p)
+
+  return num_mat, den_mat
+
+end # function numer_denom_simplify
 
 
 

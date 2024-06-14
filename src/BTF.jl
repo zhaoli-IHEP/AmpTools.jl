@@ -303,7 +303,7 @@ function block_inverse(
     det_mat = get_det( BTF_mat )
     @assert !iszero(det_mat) 
     adj_mat = get_adj( BTF_mat )
-    inv_mat = rational_function_simplify( adj_mat/det_mat, verbose=false )
+    inv_mat = adj_mat/det_mat
     return inv_mat
   end # if
 
@@ -317,13 +317,6 @@ function block_inverse(
   @assert !iszero(det_A_block) 
   adj_A_block = get_adj( A_block )
   inv_A_block = adj_A_block/det_A_block
-
-  #println( "[ Simplify the inverse matrix ]" )
-  #cost_time = @elapsed begin
-  inv_A_block = rational_function_simplify( inv_A_block, verbose=false )
-  #end # cost_time
-  #println( "[ Done $(cost_time) sec ]" )
-  #flush(stdout)
 
   inv_B_block = block_inverse( B_block, prt_size_list[2:end] )
 
@@ -348,7 +341,7 @@ end # function block_inverse
 ##########################
 function BTF_inverse(
     the_mat::Matrix{Basic} 
-)::Matrix{Basic} 
+)::Tuple{Matrix{Basic},Matrix{Basic}}
 ##########################
 
   nr, nc = size(the_mat)
@@ -360,8 +353,11 @@ function BTF_inverse(
     flag_mat[rr,cc] = iszero(the_mat[rr,cc]) ? zero(Int64) : one(Int64)
   end # for rr, cc
 
+  cost_time = @elapsed begin
   prt_size_list, ordering = construct_prt( flag_mat )
-  @show prt_size_list ordering
+  #@show prt_size_list ordering
+  end # cost_time
+  println( "[ Done construct_prt $(cost_time) sec ]" )
 
   Pmat = zeros( Basic, nn, nn )
   Pmat⁻¹ = zeros( Basic, nn, nn )
@@ -375,12 +371,16 @@ function BTF_inverse(
   @assert ordering == check_ordering
 
   @assert Pmat*Pmat⁻¹ == one( Matrix{Basic}( undef, nn, nn ) )
+  println( "[ Calculate BTF_mat ]" )
+  cost_time = @elapsed begin
   BTF_mat = Pmat⁻¹*the_mat*Pmat
+  end # cost_time
+  println( "[ Done multiplication $(cost_time) sec ]" )
 
+  cost_time = @elapsed begin
   check_BTF_mat = the_mat[ordering,ordering]
   @assert all( iszero, BTF_mat-check_BTF_mat )
 
-  println( "Done multiplication" )
   for index in 1:length(prt_size_list)
     prt_size = prt_size_list[index]
     header = sum( prt_size_list[1:(index-1)] ) 
@@ -388,6 +388,10 @@ function BTF_inverse(
     @show index check
     @assert check == true
   end # for prt_size
+
+  end # cost_time
+  println( "[ Done check $(cost_time) sec ]" )
+
 
   #@show prt_size_list
   cost_time = @elapsed begin
@@ -401,13 +405,20 @@ function BTF_inverse(
   
   println( "Check the_mat*inv_the_mat" )
   cost_time = @elapsed begin
-  check_mat = rational_function_simplify( the_mat*inv_the_mat - one(the_mat), verbose=false )
+  check_mat = rational_function_simplify( the_mat*inv_the_mat - one(the_mat) )
   end # cost_time
   println( "[ Done $(cost_time) sec ]" )
   flush(stdout)
   @assert all( iszero, check_mat )
 
-  return inv_the_mat
+  println( "[ Simplify the inverse matrix ]" )
+  cost_time = @elapsed begin
+  num_inv_the_mat, den_inv_the_mat = numer_denom_simplify( inv_the_mat )
+  end # cost_time
+  println( "[ Done $(cost_time) sec ]" )
+  flush(stdout)
+
+  return num_inv_the_mat, den_inv_the_mat
 
 end # function BTF_inverse
 
