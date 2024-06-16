@@ -327,7 +327,8 @@ function block_inverse(
   inv_mat[(head_prt_size+1):end,(head_prt_size+1):end] = inv_B_block
   inv_mat[1:head_prt_size,(head_prt_size+1):end] = D_block
 
-  println( "obtain inverse of $(size(BTF_mat))" )
+  #println( "obtain inverse of $(size(BTF_mat))" )
+  printstyled( ".", color=:light_green ) 
 
   return inv_mat
 
@@ -359,6 +360,7 @@ function BTF_inverse(
   end # cost_time
   println( "[ Done construct_prt $(cost_time) sec ]" )
 
+  cost_time = @elapsed begin
   Pmat = zeros( Basic, nn, nn )
   Pmat⁻¹ = zeros( Basic, nn, nn )
   for cc in 1:nn
@@ -366,12 +368,18 @@ function BTF_inverse(
     Pmat[rr,cc] = one(Basic)
     Pmat⁻¹[cc,rr] = one(Basic)
   end # for cc
+  end # cost_time
+  println( "[ Done $(cost_time) sec ]" )
 
+  cost_time = @elapsed begin
   check_ordering = map( cc -> findfirst( !iszero, Pmat[:,cc] ), 1:nn )
   @assert ordering == check_ordering
-
+  end # cost_time
   @assert Pmat*Pmat⁻¹ == one( Matrix{Basic}( undef, nn, nn ) )
+  println( "[ Done $(cost_time) sec ]" )
+
   println( "[ Calculate BTF_mat ]" )
+  flush(stdout)
   cost_time = @elapsed begin
   BTF_mat = Pmat⁻¹*the_mat*Pmat
   end # cost_time
@@ -379,13 +387,14 @@ function BTF_inverse(
 
   cost_time = @elapsed begin
   check_BTF_mat = the_mat[ordering,ordering]
-  @assert all( iszero, BTF_mat-check_BTF_mat )
+  check_mat = rational_function_simplify( BTF_mat - check_BTF_mat )
+  @assert all( iszero, check_mat )
 
   for index in 1:length(prt_size_list)
     prt_size = prt_size_list[index]
     header = sum( prt_size_list[1:(index-1)] ) 
     check = all( iszero, BTF_mat[(header+prt_size+1):end,(header+1):(header+prt_size)] )
-    @show index check
+    #@show index check
     @assert check == true
   end # for prt_size
 
@@ -393,6 +402,7 @@ function BTF_inverse(
   println( "[ Done check $(cost_time) sec ]" )
 
 
+  println( "[ Calculate block inverse ]" )
   #@show prt_size_list
   cost_time = @elapsed begin
   inv_BTF_mat = block_inverse( BTF_mat, prt_size_list )
