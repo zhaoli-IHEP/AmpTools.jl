@@ -39,6 +39,7 @@ export gen_SPcombo
 export iszero_numerical
 export get_det, get_adj, get_dot, rref, calc_null_space
 export get_matrix_shape_str, get_mma_str
+export thread_get_numer_denom
 export calc_sha256
 export is_sym_index_format, is_loop_mom, is_ext_mom
 export get_sym_index, get_loop_index, get_ext_index
