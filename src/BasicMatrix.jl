@@ -397,18 +397,23 @@ end # function get_mma_str
 
 ######################################
 function thread_get_numer_denom(
-    mat::Matrix{Basic}
+    mat::Matrix{Basic}, 
+    message::String = ""
 )::Tuple{Matrix{Basic},Matrix{Basic}}
 ######################################
 
   Nmat = zero(mat)
   Dmat = zero(mat)
   cart = CartesianIndices(mat)
+
+  prog = Progress( length(cart); barglyphs=BarGlyphs("[=> ]"), desc = message, enabled = !isempty(message) )
   Threads.@threads for cart_index in 1:length(cart)
     rr = cart[cart_index][1]
     cc = cart[cart_index][2]
     Nmat[rr,cc], Dmat[rr,cc] = SymEngine.as_numer_denom(mat[rr,cc])
+    next!(prog)
   end # for cart_index
+  finish!(prog)
 
   return Nmat, Dmat
 
